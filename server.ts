@@ -1,11 +1,15 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
 
+// Prefer local developer env file, but still allow a normal .env
+dotenv.config({ path: ".env.local" });
+dotenv.config();
+
 const resend = new Resend(process.env.RESEND_API_KEY);
-const PRIMARY_EMAIL = "jared@ottermaticsystems.com";
-const CC_EMAILS = ["rachagold.art@gmail.com"];
+const PRIMARY_EMAIL = "rachagold.art@gmail.com";
+const CC_EMAILS: string[] = [];
 
 async function startServer() {
   const app = express();
@@ -56,12 +60,31 @@ async function startServer() {
   });
 
   app.post("/api/waitlist", async (req, res) => {
-    const { email } = req.body;
+    const { email, name, phone, contactMethod, items, cartTotal } = req.body;
 
     if (!email) {
       res.status(400).json({ success: false, message: "Email is required." });
       return;
     }
+
+    const orderItemsHtml =
+      Array.isArray(items) && items.length > 0
+        ? `
+          <h3>Items</h3>
+          <ul>
+            ${items
+              .map((i: any) => {
+                const qty = i?.quantity ?? 1;
+                const size = i?.size ? ` — Size: ${i.size}` : "";
+                const color = i?.color ? ` — Color: ${i.color}` : "";
+                const price = typeof i?.price === "number" ? ` — $${i.price.toFixed(2)}` : "";
+                const itemName = String(i?.name ?? "Item");
+                return `<li>${itemName} (x${qty})${size}${color}${price}</li>`;
+              })
+              .join("")}
+          </ul>
+        `
+        : "";
 
     const emailPayload = {
       from: "Rachel Goldberg Art <onboarding@resend.dev>",
@@ -69,7 +92,12 @@ async function startServer() {
       html: `
         <h2>New Waitlist Signup</h2>
         <p><strong>Email:</strong> ${email}</p>
-        <p>This person wants to be notified when international shipping opens.</p>
+        ${name ? `<p><strong>Name:</strong> ${name}</p>` : ""}
+        ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ""}
+        ${contactMethod ? `<p><strong>Preferred contact:</strong> ${contactMethod}</p>` : ""}
+        ${orderItemsHtml}
+        ${typeof cartTotal === "number" ? `<p><strong>Cart total:</strong> $${cartTotal.toFixed(2)}</p>` : ""}
+        <p>This person wants to be notified when shipping/reservations open and/or to confirm their preorder.</p>
       `,
     };
 

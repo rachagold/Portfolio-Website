@@ -15,6 +15,8 @@ export interface Product {
   sizePrice?: Record<string, number>;
   sizeImages?: Record<string, string>;
   inStock: boolean;
+  /** Optional Cambodia-local price override (USD). */
+  cambodiaPrice?: number;
 }
 
 export interface Painting {

@@ -1,4 +1,5 @@
 import { Product } from '../lib/types';
+import { originalArtworks } from './originalArtworks';
 
 export const products: Product[] = [
   // ─── Lead with variety: Tote → Print → T-Shirt → Tote → Print → ... ──
@@ -310,5 +311,6 @@ export const products: Product[] = [
     sizePrice: { 'A6 (Post card)': 5, 'A4': 20, 'A3 (Poster)': 30 },
     sizeImages: { 'A6 (Post card)': '/images/products/prints/jeju/lifestyle_mockup.jpg', 'A4': '/images/products/prints/jeju/a4_mockup.jpg', 'A3 (Poster)': '/images/products/prints/jeju/a3_mockup.jpg' },
     inStock: true
-  }
+  },
+  ...originalArtworks,
 ];

@@ -25,6 +25,7 @@ export function getPrice(
     return product.price;
   }
   // Cambodia
+  if (typeof product.cambodiaPrice === 'number') return product.cambodiaPrice;
   const sizes = CAMBODIA_SIZE[product.category];
   if (size && sizes?.[size]) return sizes[size];
   return CAMBODIA_BASE[product.category] ?? product.price;
@@ -36,6 +37,7 @@ export function getBasePrice(
   region: 'Cambodia' | 'International',
 ): number {
   if (region === 'International') return product.price;
+  if (typeof product.cambodiaPrice === 'number') return product.cambodiaPrice;
   return CAMBODIA_BASE[product.category] ?? product.price;
 }
 

@@ -64,7 +64,7 @@ export const paintings: Painting[] = [
   },
   {
     id: 'c6',
-    title: 'Independence',
+    title: 'Independence Monument',
     year: '2025',
     medium: 'Acrylic on Canvas',
     collection: 'Cambodia',
@@ -76,7 +76,7 @@ export const paintings: Painting[] = [
   // ─── Cambodia Excess Paint (7) ────────────────────────────────────
   {
     id: 'ep1',
-    title: 'Russian Market ii EP',
+    title: 'Russian Market EP ii',
     year: '2026',
     medium: 'Acrylic on Canvas',
     dimensions: '20x20cm',
@@ -88,7 +88,7 @@ export const paintings: Painting[] = [
   },
   {
     id: 'ep2',
-    title: 'Koh Rong EP',
+    title: 'Koh Rong EP i',
     year: '2025',
     medium: 'Acrylic on Canvas',
     dimensions: '30cm',
@@ -123,7 +123,7 @@ export const paintings: Painting[] = [
   },
   {
     id: 'ep5',
-    title: 'Independence EP',
+    title: 'Independence Monument EP',
     year: '2025',
     medium: 'Acrylic on Canvas',
     collection: 'Cambodia',

@@ -48,10 +48,10 @@ export function Home() {
 
           <AnimatedSection direction="left" delay={0.2} className="order-1 lg:order-2 text-white">
             <h1 className="text-5xl md:text-7xl font-serif leading-tight mb-6">
-              Where Geometry<br/>Meets the Earth
+              Geo Graphic
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-8 max-w-lg font-light">
-              Original paintings exploring the tension between natural landscapes and modern design. Based in Phnom Penh, Cambodia.
+              The interaction of observed landscapes, modern design and organic subjects
             </p>
             <Link to="/portfolio/cambodia" className="pointer-events-auto inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-4 rounded-full transition-all font-medium tracking-wide">
               View the Collection

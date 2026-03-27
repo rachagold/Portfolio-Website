@@ -8,6 +8,7 @@ export function CartDrawer() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const hasOriginals = items.some((i) => i.product.category === 'Originals');
 
   if (!isCartOpen) return null;
 
@@ -67,7 +68,7 @@ export function CartDrawer() {
               >
                 Checkout
               </button>
-            ) : region === 'Cambodia' ? (
+            ) : region === 'Cambodia' && !hasOriginals ? (
               <div className="space-y-4">
                 <h3 className="text-xl font-serif text-[#93312A]">Complete Your Order</h3>
                 <div className="flex justify-center">
@@ -95,9 +96,11 @@ export function CartDrawer() {
               </div>
             ) : (
               <div className="space-y-4">
-                <h3 className="text-xl font-serif text-[#93312A]">Preorder — International</h3>
+                <h3 className="text-xl font-serif text-[#93312A]">Preorder</h3>
                 <p className="text-sm text-[#2D1F1C]">
-                  International orders will not be delivered until July 2026. You can preorder now without payment. Rachel will reach out to you to confirm your order.
+                  {region === 'International'
+                    ? "International orders will not be delivered until July 2026. You can preorder now without payment. Rachel will reach out to you to confirm your order."
+                    : "Original artworks are reserved via preorder. No payment is collected at checkout — Rachel will reach out to confirm details."}
                 </p>
                 {preorderStatus === 'success' ? (
                   <div className="bg-[#779C91]/20 text-[#2D1F1C] p-4 rounded-xl text-center">
