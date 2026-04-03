@@ -32,6 +32,7 @@ const CAMBODIA_PRICE_USD_BY_TITLE: Record<string, number> = {
   'Independence Monument EP': 190,
   'Koh Rong': 1400,
   'Koh Rong EP i': 210,
+  'Koh Rong EP ii': 190,
   'Battambang': 1500,
   'Battambang EP': 120,
   'Russian Market ii': 1500,
