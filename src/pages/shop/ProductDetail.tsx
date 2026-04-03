@@ -229,8 +229,17 @@ export function ProductDetail() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {relatedProducts.map((p, i) => (
             <Link key={p.id} to={`/shop/${p.slug}`} className="group text-center">
-              <div className="aspect-square rounded-full overflow-hidden mb-6 bg-white shadow-md p-6 group-hover:shadow-xl transition-all duration-300">
-                <img src={p.image} alt={p.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" referrerPolicy="no-referrer"/>
+              <div className={`aspect-square rounded-full overflow-hidden mb-6 bg-white shadow-md group-hover:shadow-xl transition-all duration-300 ${
+                p.category === 'T-shirts' || p.category === 'Prints' ? '' : 'p-6'
+              }`}>
+                <img 
+                  src={p.image} 
+                  alt={p.name} 
+                  className={`w-full h-full group-hover:scale-110 transition-transform duration-500 ${
+                    p.category === 'T-shirts' || p.category === 'Prints' ? 'object-cover' : 'object-contain'
+                  }`} 
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <h3 className="font-medium text-[#2D1F1C] mb-1">{p.name}</h3>
               <p className="text-[#2D1F1C]/70">${getBasePrice(p, region).toFixed(2)}</p>

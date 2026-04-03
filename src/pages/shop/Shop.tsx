@@ -12,16 +12,18 @@ export function Shop() {
   const [filters, setFilters] = useState({
     category: [] as string[],
     collection: [] as string[],
-    size: [] as string[],
-    priceRange: [0, 50] as [number, number]
+    artwork: [] as string[],
+    priceRange: [5, 9000] as [number, number]
   });
 
   const [expandedSections, setExpandedSections] = useState({
     category: true,
     collection: true,
-    size: true,
+    artwork: true,
     price: true
   });
+
+  const [showAllArtworks, setShowAllArtworks] = useState(false);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -38,24 +40,22 @@ export function Shop() {
     });
   };
 
-  const maxPrice = useMemo(() => {
-    const max = products.reduce((acc, p) => Math.max(acc, getBasePrice(p, region)), 0);
-    // Round up to a nice number for the slider
-    if (max <= 50) return 50;
-    if (max <= 500) return Math.ceil(max / 25) * 25;
-    if (max <= 2000) return Math.ceil(max / 50) * 50;
-    return Math.ceil(max / 100) * 100;
-  }, [region]);
+  const maxPrice = 9000;
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       if (filters.category.length > 0 && !filters.category.includes(product.category)) return false;
       if (filters.collection.length > 0 && !filters.collection.includes(product.collection)) return false;
+      
+      if (filters.artwork.length > 0) {
+        const matchesArtwork = filters.artwork.some(art => 
+          product.name.toLowerCase().includes(art.toLowerCase())
+        );
+        if (!matchesArtwork) return false;
+      }
+
       const priceForFilter = getBasePrice(product, region);
       if (priceForFilter < filters.priceRange[0] || priceForFilter > filters.priceRange[1]) return false;
-      
-      // Size and color filtering logic would be more complex depending on how variants are structured
-      // For simplicity, we'll skip strict variant filtering here unless the product has those options
       
       return true;
     });
@@ -68,13 +68,18 @@ export function Shop() {
     { label: 'Original Artwork', value: 'Originals' },
   ];
   const collections = ['Cambodia', 'Korea'];
-  const sizes = ['Medium', 'Large', 'X-Large', 'XX-Large', 'A6 (Post card)', 'A4', 'A3 (Poster)', 'Standard'];
+  const artworks = [
+    'Russian Market', 'Koh Rong', 'Phnom Aoral', 'Daun Penh', 
+    'Independence Monument', 'Battambang', 'Jeju', 'Nowon-Gu', 
+    'Nami Island', 'Dobongsan', 'Phnom Penh', 'Golden Ganesha', 
+    'Bangkok', 'Rocky Mountains'
+  ];
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       <AnimatedSection className="text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-serif text-[#93312A] mb-4">Shop</h1>
+        <h2 className="text-3xl font-serif text-[#93312A] mb-2">Select Location</h2>
         <p className="text-[#2D1F1C]/80 text-lg mb-8">
-          Prints, t-shirts, totes, and original artwork. Each product features artwork from the Geo Graphic series.
+          Availability, payment and delivery methods will vary per location.
         </p>
 
         <div className="inline-flex bg-[#EAE6DF] rounded-full p-1">
@@ -98,8 +103,8 @@ export function Shop() {
       {region === 'Cambodia' && (
         <AnimatedSection className="mb-12">
           <div className="bg-[#F5F0E8] border-l-4 border-[#779C91] rounded-r-2xl p-6 md:p-8">
-            <h3 className="text-2xl font-serif text-[#93312A] mb-2">Shopping in Cambodia</h3>
-            <p className="text-[#2D1F1C]/80">Local delivery available in Phnom Penh and select areas via Grab.</p>
+            <h3 className="text-2xl font-serif text-[#93312A] mb-2">Cambodia Shop</h3>
+            <p className="text-[#2D1F1C]/80">Payment via ABA | Delivery via Grab Phnom Penh.</p>
           </div>
         </AnimatedSection>
       )}
@@ -107,8 +112,8 @@ export function Shop() {
       {region === 'International' && (
         <AnimatedSection className="mb-12">
           <div className="bg-[#F5F0E8] border-l-4 border-[#93312A] rounded-r-2xl p-6 md:p-8">
-            <h3 className="text-2xl font-serif text-[#93312A] mb-2">International Shipping</h3>
-            <p className="text-[#2D1F1C]/80">International orders will not be delivered until July 2026. You can preorder now without payment. Rachel will reach out to you to confirm your order.</p>
+            <h3 className="text-2xl font-serif text-[#93312A] mb-2">Pre-Orders Only</h3>
+            <p className="text-[#2D1F1C]/80">International Preorders Only: Preorder before June 5th | Delivering July 2026.</p>
           </div>
         </AnimatedSection>
       )}
@@ -116,10 +121,10 @@ export function Shop() {
       <div className="flex flex-col md:flex-row gap-12">
         {/* Sidebar Filters */}
         <div className="w-full md:w-64 flex-shrink-0 space-y-8">
-          {/* Category */}
+          {/* Product (formerly Category) */}
           <div className="border-b border-[#93312A]/10 pb-6">
             <button className="flex justify-between items-center w-full text-lg font-serif text-[#93312A] mb-4" onClick={() => toggleSection('category')}>
-              Category {expandedSections.category ? <ChevronUp className="w-5 h-5"/> : <ChevronDown className="w-5 h-5"/>}
+              Product {expandedSections.category ? <ChevronUp className="w-5 h-5"/> : <ChevronDown className="w-5 h-5"/>}
             </button>
             {expandedSections.category && (
               <div className="space-y-3">
@@ -160,23 +165,33 @@ export function Shop() {
             )}
           </div>
 
-          {/* Size */}
+          {/* Artwork (formerly Size) */}
           <div className="border-b border-[#93312A]/10 pb-6">
-            <button className="flex justify-between items-center w-full text-lg font-serif text-[#93312A] mb-4" onClick={() => toggleSection('size')}>
-              Size {expandedSections.size ? <ChevronUp className="w-5 h-5"/> : <ChevronDown className="w-5 h-5"/>}
+            <button className="flex justify-between items-center w-full text-lg font-serif text-[#93312A] mb-4" onClick={() => toggleSection('artwork')}>
+              Artwork {expandedSections.artwork ? <ChevronUp className="w-5 h-5"/> : <ChevronDown className="w-5 h-5"/>}
             </button>
-            {expandedSections.size && (
-              <div className="flex flex-wrap gap-2">
-                {sizes.map(size => (
-                  <button key={size} onClick={() => toggleFilter('size', size)}
-                    className={`px-3 py-2 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                      filters.size.includes(size) ? 'bg-[#779C91] text-white' : 'bg-white text-[#2D1F1C] border border-[#93312A]/20 hover:border-[#93312A]'
-                    }`}
+            {expandedSections.artwork && (
+              <>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {(showAllArtworks ? artworks : artworks.slice(0, 5)).map(art => (
+                    <button key={art} onClick={() => toggleFilter('artwork', art)}
+                      className={`px-3 py-2 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                        filters.artwork.includes(art) ? 'bg-[#779C91] text-white' : 'bg-white text-[#2D1F1C] border border-[#93312A]/20 hover:border-[#93312A]'
+                      }`}
+                    >
+                      {art}
+                    </button>
+                  ))}
+                </div>
+                {artworks.length > 5 && (
+                  <button 
+                    onClick={() => setShowAllArtworks(!showAllArtworks)}
+                    className="text-sm font-medium text-[#93312A] hover:underline"
                   >
-                    {size}
+                    {showAllArtworks ? 'Show Less' : 'Show More'}
                   </button>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </div>
 
@@ -189,15 +204,15 @@ export function Shop() {
               <div>
                 <input
                   type="range"
-                  min="0"
-                  max={maxPrice}
-                  value={Math.min(filters.priceRange[1], maxPrice)}
-                  onChange={(e) => setFilters(prev => ({ ...prev, priceRange: [0, parseInt(e.target.value)] }))}
+                  min="5"
+                  max="9000"
+                  value={filters.priceRange[1]}
+                  onChange={(e) => setFilters(prev => ({ ...prev, priceRange: [5, parseInt(e.target.value)] }))}
                   className="w-full h-2 bg-[#EAE6DF] rounded-lg appearance-none cursor-pointer accent-[#779C91]"
                 />
                 <div className="flex justify-between text-sm text-[#2D1F1C]/70 mt-2">
-                  <span>$0</span>
-                  <span>${Math.min(filters.priceRange[1], maxPrice)}</span>
+                  <span>$5</span>
+                  <span>${filters.priceRange[1]}</span>
                 </div>
               </div>
             )}
