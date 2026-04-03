@@ -39,7 +39,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pointer-events-none">
           <AnimatedSection direction="right" className="order-2 lg:order-1">
             <div className="relative w-full max-w-md mx-auto lg:mx-0">
-              <div className="aspect-square bg-[#E5DCCD] rounded-lg p-4 shadow-2xl transform -rotate-2">
+              <div className="aspect-square shadow-2xl">
                 <img src="/images/paintings/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded" referrerPolicy="no-referrer"/>
               </div>
               <p className="mt-3 text-sm font-mono text-white/80 text-center">Russian Market ii (2026)</p>

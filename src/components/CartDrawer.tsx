@@ -99,7 +99,7 @@ export function CartDrawer() {
                 <h3 className="text-xl font-serif text-[#93312A]">Preorder</h3>
                 <p className="text-sm text-[#2D1F1C]">
                   {region === 'International'
-                    ? "International orders will not be delivered until July 2026. You can preorder now without payment. Rachel will reach out to you to confirm your order."
+                    ? "International orders will not be delivered until July 2026. You can preorder now until June 5th."
                     : "Original artworks are reserved via preorder. No payment is collected at checkout — Rachel will reach out to confirm details."}
                 </p>
                 {preorderStatus === 'success' ? (

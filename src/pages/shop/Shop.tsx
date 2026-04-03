@@ -7,7 +7,16 @@ import { getBasePrice, hasSizePricing } from '../../lib/pricing';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export function Shop() {
-  const { region, setRegion, addToCart } = useCart();
+  const { region, setRegion, addToCart, items, clearCart } = useCart();
+  const [pendingRegion, setPendingRegion] = useState<'Cambodia' | 'International' | null>(null);
+
+  const handleRegionChange = (newRegion: 'Cambodia' | 'International') => {
+    if (items.length > 0 && newRegion !== region) {
+      setPendingRegion(newRegion);
+    } else {
+      setRegion(newRegion);
+    }
+  };
   
   const [filters, setFilters] = useState({
     category: [] as string[],
@@ -76,6 +85,32 @@ export function Shop() {
   ];
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
+      {pendingRegion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2D1F1C]/40 backdrop-blur-sm">
+          <div className="bg-[#F5F0E8] rounded-2xl p-8 max-w-md w-full shadow-2xl relative text-left">
+            <h3 className="text-2xl font-serif text-[#93312A] mb-2 text-center">Clear Existing Cart</h3>
+            <p className="text-[#2D1F1C]/80 text-center mb-8">Switching your location will reset your cart.</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setPendingRegion(null)}
+                className="w-full py-3 rounded-full font-medium transition-colors border border-[#93312A] text-[#93312A] hover:bg-[#93312A]/5"
+              >
+                Remain in Shop
+              </button>
+              <button
+                onClick={() => {
+                  clearCart();
+                  setRegion(pendingRegion);
+                  setPendingRegion(null);
+                }}
+                className="w-full py-3 rounded-full font-medium transition-colors bg-[#93312A] text-white hover:bg-[#7a2822]"
+              >
+                Go to {pendingRegion} Shop
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <AnimatedSection className="text-center mb-16">
         <h2 className="text-3xl font-serif text-[#93312A] mb-2">Select Location</h2>
         <p className="text-[#2D1F1C]/80 text-lg mb-8">
@@ -83,14 +118,14 @@ export function Shop() {
         </p>
 
         <div className="inline-flex bg-[#EAE6DF] rounded-full p-1">
-          <button onClick={() => setRegion('Cambodia')}
+          <button onClick={() => handleRegionChange('Cambodia')}
             className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
               region === 'Cambodia' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
             }`}
           >
             Cambodia
           </button>
-          <button onClick={() => setRegion('International')}
+          <button onClick={() => handleRegionChange('International')}
             className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
               region === 'International' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
             }`}
@@ -246,11 +281,19 @@ export function Shop() {
                       <h3 className="text-lg font-medium text-[#2D1F1C] mb-1">{product.name}</h3>
                       <p className="text-[#2D1F1C]/80 mb-4">{hasSizePricing(product, region) ? `from $${getBasePrice(product, region).toFixed(2)}` : `$${getBasePrice(product, region).toFixed(2)}`}</p>
                     </Link>
-                    <button onClick={() => addToCart(product, 1, undefined, undefined, getBasePrice(product, region))}
-                      className="mt-auto w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
-                    >
-                      Add to Cart
-                    </button>
+                    {product.category !== 'Originals' && ((product.sizes && product.sizes.length > 0) || (product.colors && product.colors.length > 0)) ? (
+                      <Link to={`/shop/${product.slug}`}
+                        className="mt-auto flex items-center justify-center w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
+                      >
+                        See Options
+                      </Link>
+                    ) : (
+                      <button onClick={() => addToCart(product, 1, undefined, undefined, getBasePrice(product, region))}
+                        className="mt-auto w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
+                      >
+                        Add to Cart
+                      </button>
+                    )}
                   </div>
                 </div>
               </AnimatedSection>

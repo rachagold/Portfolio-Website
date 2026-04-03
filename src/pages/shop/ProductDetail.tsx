@@ -13,10 +13,8 @@ export function ProductDetail() {
   const { addToCart, region } = useCart();
   
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || '');
-  const [selectedSize, setSelectedSize] = useState(
-    product?.sizes?.includes('A4') ? 'A4' : (product?.sizes?.[0] || '')
-  );
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'Description' | 'Sizing' | 'Shipping'>('Description');
   const [displayPrice, setDisplayPrice] = useState(product?.price || 0);
@@ -46,8 +44,8 @@ export function ProductDetail() {
 
   React.useEffect(() => {
     if (product) {
-      setSelectedColor(product.colors?.[0] || '');
-      setSelectedSize(product.sizes?.includes('A4') ? 'A4' : (product.sizes?.[0] || ''));
+      setSelectedColor('');
+      setSelectedSize('');
       setQuantity(1);
       setActiveImage(0);
     }
@@ -150,8 +148,9 @@ export function ProductDetail() {
               <h3 className="text-[#2D1F1C] text-sm mb-2">Size:</h3>
               <div className="relative">
                 <select value={selectedSize} onChange={(e) => setSelectedSize(e.target.value)}
-                  className="w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 text-[#2D1F1C] focus:outline-none focus:ring-2 focus:ring-[#93312A]/50"
+                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${!selectedSize ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'}`}
                 >
+                  <option value="" disabled>Select a size...</option>
                   {product.sizes.map(size => (
                     <option key={size} value={size}>{size}</option>
                   ))}
@@ -166,8 +165,9 @@ export function ProductDetail() {
               <h3 className="text-[#2D1F1C] text-sm mb-2">Color:</h3>
               <div className="relative">
                 <select value={selectedColor} onChange={(e) => setSelectedColor(e.target.value)}
-                  className="w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 text-[#2D1F1C] focus:outline-none focus:ring-2 focus:ring-[#93312A]/50"
+                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${!selectedColor ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'}`}
                 >
+                  <option value="" disabled>Select a color...</option>
                   {product.colors.map(color => (
                     <option key={color} value={color}>{color}</option>
                   ))}
@@ -188,9 +188,25 @@ export function ProductDetail() {
               </button>
             </div>
 
-            <button onClick={handleAddToCart} className="flex-1 bg-[#779C91] hover:bg-[#5E857A] text-white py-4 rounded-full text-lg font-medium transition-colors">
-              Add to Cart
-            </button>
+            {(() => {
+              const isAddToCartDisabled = Boolean(
+                (product.sizes?.length && !selectedSize) ||
+                (product.colors?.length && !selectedColor)
+              );
+              return (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAddToCartDisabled}
+                  className={`flex-1 py-4 rounded-full text-lg font-medium transition-colors ${
+                    isAddToCartDisabled
+                      ? 'bg-[#779C91]/50 cursor-not-allowed text-white/70'
+                      : 'bg-[#779C91] hover:bg-[#5E857A] text-white'
+                  }`}
+                >
+                  {isAddToCartDisabled ? 'Select Options' : 'Add to Cart'}
+                </button>
+              );
+            })()}
           </div>
 
           {/* Tabs */}

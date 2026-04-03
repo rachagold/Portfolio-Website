@@ -42,7 +42,7 @@ export function Exhibition() {
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20">
           <AnimatedSection direction="right" className="order-2 lg:order-1">
             <div className="relative w-full max-w-md mx-auto">
-              <div className="aspect-[4/5] bg-white rounded-lg p-2 shadow-2xl transform -rotate-3">
+              <div className="aspect-[4/5] shadow-2xl">
                 <img src="/images/about/exhibition_poster.png" alt="Geo Graphic Exhibition Poster" className="w-full h-full object-cover rounded" referrerPolicy="no-referrer"/>
               </div>
             </div>
