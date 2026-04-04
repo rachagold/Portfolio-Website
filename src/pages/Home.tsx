@@ -37,13 +37,10 @@ export function Home() {
         <BackgroundBoxes />
 
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pointer-events-none">
-          <AnimatedSection direction="right" className="order-2 lg:order-1">
-            <div className="relative w-full max-w-md mx-auto lg:mx-0">
-              <div className="aspect-square shadow-2xl">
-                <img src="/images/paintings/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded" referrerPolicy="no-referrer"/>
-              </div>
-              <p className="mt-3 text-sm font-mono text-white/80 text-center">Russian Market ii (2026)</p>
-            </div>
+          <AnimatedSection direction="right" className="order-2 lg:order-1 w-full h-full">
+            <Link to="/portfolio/cambodia#russian-market-ii" className="block relative w-full h-[60vh] lg:h-[85vh] py-8 lg:py-12 pointer-events-auto">
+              <img src="/images/paintings/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
+            </Link>
           </AnimatedSection>
 
           <AnimatedSection direction="left" delay={0.2} className="order-1 lg:order-2 text-white">
@@ -111,21 +108,21 @@ export function Home() {
               .sort((a, b) => (a.id === 'c5' ? -1 : b.id === 'c5' ? 1 : 0))
               .slice(0, 3);
             return (
-              <div className="columns-1 md:columns-3 gap-6">
+              <div className="flex flex-col md:flex-row gap-6 justify-start">
                 {cambodiaPaintings.map(painting => (
-                  <div key={painting.id} className="break-inside-avoid mb-6 group block cursor-pointer" onClick={() => openLightbox(painting)}>
-                    <div className="overflow-hidden bg-[#F5F0E8] mb-3 relative">
+                  <div key={painting.id} className="group block cursor-pointer flex-1" onClick={() => openLightbox(painting)}>
+                    <div className="overflow-hidden bg-transparent mb-3 relative rounded-xl flex items-center justify-center">
                       <img
                         src={painting.image}
                         alt={painting.title}
-                        className="w-full h-auto block transition-transform duration-700 group-hover:scale-[1.03]"
+                        className="w-full h-auto md:w-full md:h-[400px] object-contain bg-transparent block transition-transform duration-700 group-hover:scale-[1.03]"
                         referrerPolicy="no-referrer"
                       />
                       {painting.status === 'Sold' && (
-                        <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full">Sold</div>
+                        <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">Sold</div>
                       )}
                       {painting.subCollection === 'Excess Paint' && (
-                        <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full">EP</div>
+                        <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">EP</div>
                       )}
                     </div>
                     <h3 className="font-serif text-xl text-[#2D1F1C] group-hover:text-[#93312A] transition-colors">{painting.title} ({painting.year})</h3>
@@ -157,16 +154,16 @@ export function Home() {
             </Link>
           </div>
 
-          <div className="columns-1 md:columns-3 gap-8">
+          <div className="flex flex-col md:flex-row gap-8 justify-start">
             {paintings.filter(p => p.collection === 'Korea').slice(0, 3).map((painting) => (
-              <div key={painting.id} className="break-inside-avoid mb-8 group block cursor-pointer" onClick={() => openLightbox(painting)}>
-                <div className="overflow-hidden mb-4 bg-white shadow-sm relative">
-                  <img src={painting.image} alt={painting.title} className="w-full h-auto block group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
+              <div key={painting.id} className="group block cursor-pointer flex-1" onClick={() => openLightbox(painting)}>
+                <div className="overflow-hidden mb-4 bg-transparent shadow-sm relative rounded-xl flex items-center justify-center">
+                  <img src={painting.image} alt={painting.title} className="w-full h-auto md:w-full md:h-[400px] object-contain bg-transparent block group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
                   {painting.status === 'Sold' && (
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full">Sold</div>
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">Sold</div>
                   )}
                   {painting.subCollection === 'Excess Paint' && (
-                    <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full">EP</div>
+                    <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">EP</div>
                   )}
                 </div>
                 <h3 className="font-serif text-lg text-[#2D1F1C] group-hover:text-[#93312A] transition-colors">{painting.title} ({painting.year})</h3>

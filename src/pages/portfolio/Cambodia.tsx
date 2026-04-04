@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AnimatedSection } from '../../components/AnimatedSection';
 import { paintings } from '../../data/paintings';
 import { Lightbox } from '../../components/Lightbox';
@@ -7,6 +8,19 @@ import { Painting } from '../../lib/types';
 export function Cambodia() {
   const [activeTab, setActiveTab] = useState<'All' | 'Main Series' | 'Excess Paint'>('All');
   const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        const id = location.hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }
+  }, [location]);
 
   const cambodiaPaintings = paintings.filter(p => p.collection === 'Cambodia');
 

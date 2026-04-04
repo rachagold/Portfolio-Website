@@ -34,7 +34,7 @@ export function CartDrawer() {
             <div className="space-y-6">
               {items.map((item, index) => (
                 <div key={`${item.product.id}-${index}`} className="flex gap-4 items-start">
-                  <img src={item.product.image} alt={item.product.name} className="w-20 h-20 object-cover rounded-md shadow-sm" referrerPolicy="no-referrer" />
+                  <img src={item.product.image} alt={item.product.name} className="w-20 h-20 object-contain bg-transparent rounded-md shadow-sm" referrerPolicy="no-referrer" />
                   <div className="flex-1">
                     <h3 className="font-medium text-[#2D1F1C]">{item.product.name}</h3>
                     <p className="text-sm text-[#2D1F1C]/70">

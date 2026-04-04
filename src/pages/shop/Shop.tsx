@@ -256,22 +256,22 @@ export function Shop() {
 
         {/* Product Grid */}
         <div className="flex-1">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-8">
             {filteredProducts.map((product, i) => (
-              <AnimatedSection key={product.id} delay={i * 0.1}>
-                <div className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#93312A]/10 h-full flex flex-col">
-                  <Link to={`/shop/${product.slug}`} className="block aspect-square rounded-xl overflow-hidden mb-4 bg-[#E5DCCD] p-4 relative">
+              <AnimatedSection key={product.id} delay={i * 0.1} className="break-inside-avoid mb-8">
+                <div className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#93312A]/10 flex flex-col">
+                  <Link to={`/shop/${product.slug}`} className="block rounded-xl overflow-hidden mb-4 bg-transparent relative">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-contain absolute inset-0 p-4 transition-opacity duration-700 group-hover:opacity-0"
+                      className="w-full h-auto object-contain bg-transparent transition-opacity duration-700 group-hover:opacity-0"
                       referrerPolicy="no-referrer"
                     />
                     {product.hoverImage && (
                       <img
                         src={product.hoverImage}
                         alt={`${product.name} alternate view`}
-                        className="w-full h-full object-contain absolute inset-0 p-4 transition-opacity duration-700 opacity-0 group-hover:opacity-100"
+                        className="w-full h-full object-contain absolute inset-0 transition-opacity duration-700 opacity-0 group-hover:opacity-100"
                         referrerPolicy="no-referrer"
                       />
                     )}
