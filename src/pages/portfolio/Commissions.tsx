@@ -5,34 +5,12 @@ import { Lightbox } from '../../components/Lightbox';
 import { Link } from 'react-router-dom';
 
 export function Commissions() {
-  const [lightboxData, setLightboxData] = useState<{
-    isOpen: boolean;
-    image: string;
-    title: string;
-    year?: string;
-    medium?: string;
-    dimensions?: string;
-    status?: string;
-    description?: string;
-  }>({
-    isOpen: false,
-    image: '',
-    title: ''
-  });
+  const [lightboxPainting, setLightboxPainting] = useState<any | null>(null);
 
   const commissions = paintings.filter(p => p.collection === 'Commissions');
 
   const handleImageClick = (painting: typeof paintings[0]) => {
-    setLightboxData({
-      isOpen: true,
-      image: painting.image,
-      title: painting.title,
-      year: painting.year,
-      medium: painting.medium,
-      dimensions: painting.dimensions,
-      status: painting.status,
-      description: painting.description,
-    });
+    setLightboxPainting(painting);
   };
 
   return (
@@ -52,9 +30,8 @@ export function Commissions() {
                 <img src={painting.image} alt={painting.title} loading="lazy" className="w-full h-auto block rounded-xl group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
               </div>
               <div>
-                <p className="text-[#2D1F1C]/60 text-sm uppercase tracking-widest mb-2">Commissioned</p>
+                <p className="text-[#2D1F1C]/60 text-sm uppercase tracking-widest mb-1">{painting.year}</p>
                 <h3 className="text-3xl font-serif text-[#93312A] mb-2">{painting.title}</h3>
-                <p className="text-[#2D1F1C]/80">{painting.year}</p>
               </div>
             </div>
           </AnimatedSection>
@@ -73,17 +50,18 @@ export function Commissions() {
         </div>
       </AnimatedSection>
 
-      {lightboxData.isOpen && (
+      {lightboxPainting && (
         <Lightbox
-          isOpen={lightboxData.isOpen}
-          image={lightboxData.image}
-          title={lightboxData.title}
-          year={lightboxData.year}
-          medium={lightboxData.medium}
-          dimensions={lightboxData.dimensions}
-          status={lightboxData.status}
-          description={lightboxData.description}
-          onClose={() => setLightboxData({ ...lightboxData, isOpen: false })}
+          isOpen={!!lightboxPainting}
+          image={lightboxPainting.image}
+          title={lightboxPainting.title}
+          description={lightboxPainting.description}
+          year={lightboxPainting.year}
+          medium={lightboxPainting.medium}
+          dimensions={lightboxPainting.dimensions}
+          status={lightboxPainting.status}
+          price={lightboxPainting.price}
+          onClose={() => setLightboxPainting(null)}
         />
       )}
     </div>

@@ -29,11 +29,6 @@ export function Korea() {
             <div className="group cursor-pointer" onClick={() => handleImageClick(painting)}>
               <div className="relative rounded-2xl overflow-hidden mb-4 bg-[#F5F0E8] shadow-md group-hover:shadow-xl transition-all duration-500">
                 <img src={painting.image} alt={painting.title} loading="lazy" className="w-full h-auto block group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
-                {painting.status === 'Sold' && (
-                  <div className="absolute top-4 right-4 bg-[#93312A] text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg transform rotate-12">
-                    SOLD
-                  </div>
-                )}
               </div>
               <div>
                 <h3 className="text-2xl font-serif text-[#93312A] mb-2">{painting.title}</h3>
@@ -58,6 +53,7 @@ export function Korea() {
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
           status={lightboxPainting.status}
+          price={lightboxPainting.price}
           onClose={() => setLightboxPainting(null)}
         />
       )}

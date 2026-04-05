@@ -10,6 +10,7 @@ interface LightboxProps {
   medium?: string;
   dimensions?: string;
   status?: 'Available' | 'Sold' | 'Commissioned';
+  price?: number;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,6 +23,7 @@ export function Lightbox({
   medium,
   dimensions,
   status,
+  price,
   isOpen,
   onClose,
 }: LightboxProps) {
@@ -83,21 +85,16 @@ export function Lightbox({
                 </p>
               )}
 
-              {status && status !== 'Available' && (
-                <span
-                  className={`inline-block mt-4 px-3 py-1 rounded-full text-xs font-medium tracking-wider uppercase ${
-                    status === 'Sold'
-                      ? 'bg-[#93312A]/20 text-[#E5DCCD] border border-[#93312A]/40'
-                      : 'bg-white/10 text-white/70 border border-white/20'
-                  }`}
-                >
-                  {status}
-                </span>
-              )}
-
               {description && (
                 <p className="text-white/70 text-sm leading-relaxed mt-5">
                   {description}
+                </p>
+              )}
+
+              {/* Price or Status */}
+              {(status === 'Sold' || status === 'Commissioned' || (status === 'Available' && price)) && (
+                <p className="text-white/50 text-sm mt-3 tracking-wide italic">
+                  {status === 'Sold' ? 'Sold' : status === 'Commissioned' ? 'Commissioned' : `$${price?.toLocaleString()}`}
                 </p>
               )}
             </div>

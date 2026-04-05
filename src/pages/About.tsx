@@ -17,7 +17,7 @@ export function About() {
               </h1>
               <div className="space-y-6 text-[#2D1F1C] leading-relaxed text-base md:text-lg">
                 <p>
-                  My work fuses graphic geometries with landscapes. Each painting starts with an observed place and becomes a conversation between organic shapes and constructed ones. Natural and industrial. Traditional and modern. I want viewers to see familiar scenes through a different lens.
+                  My work fuses graphic geometries with landscapes. Each painting starts with an observed place and becomes a conversation between organic and constructed shapes; natural and industrial elements; traditional and modern designs. I want viewers to see familiar scenes through a different lens.
                 </p>
                 <p>
                   Nothing goes to waste in my studio. Leftover paint from each piece gets repurposed into smaller works that explore texture and composition on their own. I call these my Excess Paint series.
@@ -49,7 +49,7 @@ export function About() {
                 Rachel Goldberg is an artist, designer, and educator based in Phnom Penh, Cambodia. She holds a Master of Science in Visual Art Education and a Bachelor of Fine Arts in Industrial Design. Her practice spans painting, graphic design, and teaching at international schools.
               </p>
               <p>
-                Rachel has lived and worked across Cambodia, South Korea, Taiwan, and the United States. Each place has shaped how she sees the relationship between designed spaces and the natural world.
+                Rachel has lived and worked across Cambodia, South Korea, and the United States. Each place has shaped how she sees the relationship between designed spaces and the natural world.
               </p>
               <p>
                 Her current series, Geo Graphic, explores the intersection of geometric abstraction and real landscapes. The work has been exhibited in Phnom Penh and is available as original paintings, prints, and merchandise.
@@ -76,7 +76,7 @@ export function About() {
               <h3 className="font-serif text-xl mb-2 text-[#2D1F1C]">Locations</h3>
               <p className="text-sm text-[#2D1F1C]/70">
                 Cambodia • Korea<br />
-                Taiwan • USA
+                USA
               </p>
             </div>
             <div className="bg-[#F5F0E8] rounded-2xl p-8 text-center">

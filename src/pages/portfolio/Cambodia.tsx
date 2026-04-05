@@ -134,6 +134,7 @@ export function Cambodia() {
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
           status={lightboxPainting.status}
+          price={lightboxPainting.price}
           onClose={() => setLightboxPainting(null)}
         />
       )}

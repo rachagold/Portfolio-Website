@@ -12,7 +12,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/russian_market_ii.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1500
   },
   {
     id: 'c2',
@@ -24,7 +25,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/koh_rong.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1400
   },
   {
     id: 'c3',
@@ -36,7 +38,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/daun_penh.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1400
   },
   {
     id: 'c4',
@@ -48,7 +51,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/russian_market.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1800
   },
   {
     id: 'c5',
@@ -60,7 +64,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/phnom_aoral.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 4400
   },
   {
     id: 'c6',
@@ -71,7 +76,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Main Series',
     image: '/images/paintings/cambodia/independence.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1400
   },
 
   // ─── Cambodia Excess Paint (7) ────────────────────────────────────
@@ -85,7 +91,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/russian_market_ii_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 190
   },
   {
     id: 'ep2',
@@ -97,7 +104,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/koh_rong_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 210
   },
   {
     id: 'ep8',
@@ -109,7 +117,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/koh_rong_ep_2.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 190
   },
   {
     id: 'ep3',
@@ -121,7 +130,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/daun_penh_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1200
   },
   {
     id: 'ep4',
@@ -132,7 +142,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/russian_market_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 90
   },
   {
     id: 'ep5',
@@ -143,7 +154,7 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/independence_ep.jpg',
-    status: 'Available'
+    status: 'Sold'
   },
   {
     id: 'ep6',
@@ -153,7 +164,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/battambang_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 120
   },
   {
     id: 'ep7',
@@ -164,7 +176,8 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     image: '/images/paintings/cambodia/phnom_aoral_ep.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 190
   },
 
   // ─── Korea (6) ────────────────────────────────────────────────────
@@ -177,7 +190,8 @@ export const paintings: Painting[] = [
     description: 'Temples once so grounded and balanced within natural landscapes of South Korea now recomposed by rigid, rectangular shapes. This piece explores the point when interaction and fusion shift into obstruction and constraint.',
     collection: 'Korea',
     image: '/images/paintings/korea/jeju_ii.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1200
   },
   {
     id: 'k2',
@@ -198,7 +212,8 @@ export const paintings: Painting[] = [
     description: 'Inspired by the vibrant and delicate Joseon Dynasty temples — designed to be integrated into the natural surroundings and now framed by the perfectly constructed skyscrapers of modern times — this piece represents Korea\'s ongoing fusion of tradition and contemporary.',
     collection: 'Korea',
     image: '/images/paintings/korea/jeju.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 8000
   },
   {
     id: 'k4',
@@ -209,7 +224,8 @@ export const paintings: Painting[] = [
     description: 'Namisan is romantic, energetic, and youthful. While its cultural and historical roots paint a backdrop to the scene, Nami island has been transformed into a tourist destination celebrated for its art, media and romantic appeal. This piece captures the fluidity, energy, and artistic spirit of the island, reflecting the reality of lived moments and curated beauty.',
     collection: 'Korea',
     image: '/images/paintings/korea/nami_island.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1200
   },
   {
     id: 'k5',
@@ -219,7 +235,8 @@ export const paintings: Painting[] = [
     dimensions: '45.5x53',
     collection: 'Korea',
     image: '/images/paintings/korea/nowon_gu.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1200
   },
   {
     id: 'k6',
@@ -229,7 +246,8 @@ export const paintings: Painting[] = [
     dimensions: '45.5x53',
     collection: 'Korea',
     image: '/images/paintings/korea/dobongsan.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1800
   },
 
   // ─── Commissions (2) ──────────────────────────────────────────────
@@ -263,7 +281,8 @@ export const paintings: Painting[] = [
     dimensions: '90x60cm',
     collection: 'Other Countries',
     image: '/images/paintings/other-countries/golden_ganesha.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 1200
   },
   {
     id: 'oc2',
@@ -273,7 +292,8 @@ export const paintings: Painting[] = [
     dimensions: '52x38cm',
     collection: 'Other Countries',
     image: '/images/paintings/other-countries/bangkok.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 420
   },
   {
     id: 'oc3',
@@ -283,6 +303,7 @@ export const paintings: Painting[] = [
     dimensions: '24x33cm',
     collection: 'Other Countries',
     image: '/images/paintings/other-countries/rocky_mountain.jpg',
-    status: 'Available'
+    status: 'Available',
+    price: 190
   }
 ];
