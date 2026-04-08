@@ -3,6 +3,7 @@ import { AnimatedSection } from '../../components/AnimatedSection';
 import { paintings } from '../../data/paintings';
 import { Lightbox } from '../../components/Lightbox';
 import { Painting } from '../../lib/types';
+import { originalArtworks } from '../../data/originalArtworks';
 
 export function Korea() {
   const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
@@ -11,6 +12,11 @@ export function Korea() {
 
   const handleImageClick = (painting: Painting) => {
     setLightboxPainting(painting);
+  };
+
+  const getProductPrice = (title: string) => {
+    const product = originalArtworks.find(p => p.name === title);
+    return product?.price;
   };
 
   return (
@@ -35,7 +41,7 @@ export function Korea() {
                 <p className="text-[#2D1F1C]/80">{painting.medium}</p>
                 <p className="text-[#2D1F1C]/60 text-sm mb-2">{painting.year}</p>
                 {painting.description && (
-                  <p className="text-sm text-[#2D1F1C]/60 leading-relaxed line-clamp-2 mt-2">{painting.description}</p>
+                  <p className="text-sm text-[#2D1F1C]/60 leading-relaxed mt-2">{painting.description}</p>
                 )}
               </div>
             </div>
@@ -53,7 +59,7 @@ export function Korea() {
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
           status={lightboxPainting.status}
-          price={lightboxPainting.price}
+          price={getProductPrice(lightboxPainting.title)}
           onClose={() => setLightboxPainting(null)}
         />
       )}

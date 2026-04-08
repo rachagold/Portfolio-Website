@@ -177,37 +177,48 @@ export function ProductDetail() {
             </div>
           )}
 
-          <div className="flex items-center gap-4 mb-12">
-            <div className="flex items-center border border-[#93312A] rounded-full px-4 py-2">
-              <button onClick={decreaseQuantity} className="text-[#93312A] hover:text-[#2D1F1C] p-1 transition-colors" aria-label="Decrease quantity">
-                <Minus className="w-4 h-4"/>
-              </button>
-              <span className="w-12 text-center text-[#2D1F1C] font-medium">{quantity}</span>
-              <button onClick={increaseQuantity} className="text-[#93312A] hover:text-[#2D1F1C] p-1 transition-colors" aria-label="Increase quantity">
-                <Plus className="w-4 h-4"/>
-              </button>
+          {region === 'Other' ? (
+            <div className="flex flex-col gap-4 mb-12">
+              <Link to="/contact" className="w-full bg-[#EAE6DF] hover:bg-[#DED9D0] text-[#2D1F1C] py-4 rounded-full text-lg font-medium transition-colors text-center border border-[#93312A]/10">
+                Contact me
+              </Link>
+              <p className="text-[#2D1F1C]/50 text-sm text-center italic">
+                To arrange a special order for your location.
+              </p>
             </div>
-
-            {(() => {
-              const isAddToCartDisabled = Boolean(
-                (product.sizes?.length && !selectedSize) ||
-                (product.colors?.length && !selectedColor)
-              );
-              return (
-                <button
-                  onClick={handleAddToCart}
-                  disabled={isAddToCartDisabled}
-                  className={`flex-1 py-4 rounded-full text-lg font-medium transition-colors ${
-                    isAddToCartDisabled
-                      ? 'bg-[#779C91]/50 cursor-not-allowed text-white/70'
-                      : 'bg-[#779C91] hover:bg-[#5E857A] text-white'
-                  }`}
-                >
-                  {isAddToCartDisabled ? 'Select Options' : 'Add to Cart'}
+          ) : (
+            <div className="flex items-center gap-4 mb-12">
+              <div className="flex items-center border border-[#93312A] rounded-full px-4 py-2">
+                <button onClick={decreaseQuantity} className="text-[#93312A] hover:text-[#2D1F1C] p-1 transition-colors" aria-label="Decrease quantity">
+                  <Minus className="w-4 h-4"/>
                 </button>
-              );
-            })()}
-          </div>
+                <span className="w-12 text-center text-[#2D1F1C] font-medium">{quantity}</span>
+                <button onClick={increaseQuantity} className="text-[#93312A] hover:text-[#2D1F1C] p-1 transition-colors" aria-label="Increase quantity">
+                  <Plus className="w-4 h-4"/>
+                </button>
+              </div>
+
+              {(() => {
+                const isAddToCartDisabled = Boolean(
+                  (product.sizes?.length && !selectedSize) ||
+                  (product.colors?.length && !selectedColor)
+                );
+                return (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={isAddToCartDisabled}
+                    className={`flex-1 py-4 rounded-full text-lg font-medium transition-colors ${
+                      isAddToCartDisabled
+                        ? 'bg-[#779C91]/50 cursor-not-allowed text-white/70'
+                        : 'bg-[#779C91] hover:bg-[#5E857A] text-white'
+                    }`}
+                  >
+                    {isAddToCartDisabled ? 'Select Options' : 'Add to Cart'}
+                  </button>
+                );
+              })()}
+            </div>
+          )}
 
           {/* Tabs */}
           <div className="border-t border-[#93312A]/10">

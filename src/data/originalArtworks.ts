@@ -24,8 +24,8 @@ const CAMBODIA_PRICE_USD_BY_TITLE: Record<string, number> = {
   // Cambodia
   'Phnom Aoral': 4400,
   'Phnom Aoral EP': 190,
-  'Russian Market': 1800,
-  'Russian Market EP': 90,
+  'Russian Market 25': 1800,
+  'Russian Market 25 EP': 90,
   'Daun Penh': 1400,
   'Daun Penh EP': 1200,
   'Independence Monument': 1400,
@@ -33,13 +33,11 @@ const CAMBODIA_PRICE_USD_BY_TITLE: Record<string, number> = {
   'Koh Rong': 1400,
   'Koh Rong EP i': 210,
   'Koh Rong EP ii': 190,
+  'Russian Market 26': 1500,
+  'Russian Market 26 EP': 190,
   'Battambang': 1500,
   'Battambang EP': 120,
-  'Russian Market ii': 1500,
-  'Russian Market EP ii': 190,
-  'Phnom Penh': 2800,
-
-  // Other Countries (not present in sheet currently)
+  'Phnom Penh 2026': 2800,
 };
 
 function toProductCollection(

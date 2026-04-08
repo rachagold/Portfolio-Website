@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Mail, Globe } from 'lucide-react';
+import { Instagram, Mail, Globe, MessageCircle, Send } from 'lucide-react';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -53,6 +53,14 @@ export function Footer() {
               <a href="https://instagram.com/rachagold.art" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#2D1F1C]/70 hover:text-[#93312A] transition-colors">
                 <Instagram className="w-5 h-5" />
                 <span>@rachagold.art</span>
+              </a>
+              <a href="https://wa.me/12406889866" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#2D1F1C]/70 hover:text-[#93312A] transition-colors">
+                <MessageCircle className="w-5 h-5" />
+                <span>WhatsApp</span>
+              </a>
+              <a href="https://t.me/+17459164" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-[#2D1F1C]/70 hover:text-[#93312A] transition-colors">
+                <Send className="w-5 h-5" />
+                <span>Telegram</span>
               </a>
               <a href="mailto:rachagold.art@gmail.com" className="flex items-center gap-3 text-[#2D1F1C]/70 hover:text-[#93312A] transition-colors">
                 <Mail className="w-5 h-5" />

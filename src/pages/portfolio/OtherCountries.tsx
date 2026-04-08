@@ -3,6 +3,7 @@ import { AnimatedSection } from '../../components/AnimatedSection';
 import { paintings } from '../../data/paintings';
 import { Lightbox } from '../../components/Lightbox';
 import { Painting } from '../../lib/types';
+import { originalArtworks } from '../../data/originalArtworks';
 
 export function OtherCountries() {
   const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
@@ -11,6 +12,11 @@ export function OtherCountries() {
 
   const handleImageClick = (painting: Painting) => {
     setLightboxPainting(painting);
+  };
+
+  const getProductPrice = (title: string) => {
+    const product = originalArtworks.find(p => p.name === title);
+    return product?.price;
   };
 
   return (
@@ -50,7 +56,7 @@ export function OtherCountries() {
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
           status={lightboxPainting.status}
-          price={lightboxPainting.price}
+          price={getProductPrice(lightboxPainting.title)}
           onClose={() => setLightboxPainting(null)}
         />
       )}

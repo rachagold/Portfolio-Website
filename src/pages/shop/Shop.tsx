@@ -7,7 +7,7 @@ import { getBasePrice, hasSizePricing } from '../../lib/pricing';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export function Shop() {
-  const { region, setRegion, addToCart, items, clearCart } = useCart();
+  const { region, setRegion, addToCart, items, clearCart, clearLocation } = useCart();
   const [pendingRegion, setPendingRegion] = useState<'Cambodia' | 'International' | null>(null);
 
   const handleRegionChange = (newRegion: 'Cambodia' | 'International') => {
@@ -111,29 +111,32 @@ export function Shop() {
           </div>
         </div>
       )}
-      <AnimatedSection className="text-center mb-16">
-        <h2 className="text-3xl font-serif text-[#93312A] mb-2">Select Location</h2>
-        <p className="text-[#2D1F1C]/80 text-lg mb-8">
-          Availability, payment and delivery methods will vary per location.
-        </p>
+      {/* Hidden legacy toggle - now handled by LocationSelector popup */}
+      <div className="hidden">
+        <AnimatedSection className="text-center mb-16">
+          <h2 className="text-3xl font-serif text-[#93312A] mb-2">Select Location</h2>
+          <p className="text-[#2D1F1C]/80 text-lg mb-8">
+            Availability, payment and delivery methods will vary per location.
+          </p>
 
-        <div className="inline-flex bg-[#EAE6DF] rounded-full p-1">
-          <button onClick={() => handleRegionChange('Cambodia')}
-            className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
-              region === 'Cambodia' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
-            }`}
-          >
-            Cambodia
-          </button>
-          <button onClick={() => handleRegionChange('International')}
-            className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
-              region === 'International' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
-            }`}
-          >
-            International
-          </button>
-        </div>
-      </AnimatedSection>
+          <div className="inline-flex bg-[#EAE6DF] rounded-full p-1">
+            <button onClick={() => handleRegionChange('Cambodia')}
+              className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
+                region === 'Cambodia' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
+              }`}
+            >
+              Cambodia
+            </button>
+            <button onClick={() => handleRegionChange('International')}
+              className={`px-8 py-2 rounded-full text-sm font-medium transition-colors ${
+                region === 'International' ? 'bg-[#779C91] text-white' : 'text-[#2D1F1C] hover:bg-white/50'
+              }`}
+            >
+              International
+            </button>
+          </div>
+        </AnimatedSection>
+      </div>
 
       {region === 'Cambodia' && (
         <AnimatedSection className="mb-12">
@@ -149,6 +152,28 @@ export function Shop() {
           <div className="bg-[#F5F0E8] border-l-4 border-[#93312A] rounded-r-2xl p-6 md:p-8">
             <h3 className="text-2xl font-serif text-[#93312A] mb-2">Pre-Orders Only</h3>
             <p className="text-[#2D1F1C]/80">International Preorders Only: Preorder before June 5th | Delivering July 2026.</p>
+          </div>
+        </AnimatedSection>
+      )}
+
+      {region === 'Other' && (
+        <AnimatedSection className="mb-12">
+          <div className="bg-[#F5F0E8] border-l-4 border-[#93312A] rounded-r-2xl p-6 md:p-8">
+            <h3 className="text-2xl font-serif text-[#93312A] mb-4">Browse Only</h3>
+            <p className="text-[#2D1F1C]/80 mb-6 font-medium leading-relaxed">
+              Browse only. Rachagold currently does not deliver to this location, please contact Rachel directly via Instagram, Telegram or WhatsApp to arrange a special order :)
+            </p>
+            <div className="flex flex-wrap gap-6">
+              <a href="https://instagram.com/rachagold.art" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#93312A] hover:underline font-medium">
+                Instagram
+              </a>
+              <a href="https://t.me/rachagold" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#93312A] hover:underline font-medium">
+                Telegram
+              </a>
+              <a href="https://wa.me/12406889866" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[#93312A] hover:underline font-medium">
+                WhatsApp
+              </a>
+            </div>
           </div>
         </AnimatedSection>
       )}
@@ -277,22 +302,30 @@ export function Shop() {
                     )}
                   </Link>
                   <div className="flex-1 flex flex-col">
-                    <Link to={`/shop/${product.slug}`}>
+                    <Link to={region === 'Other' ? '/contact' : `/shop/${product.slug}`}>
                       <h3 className="text-lg font-medium text-[#2D1F1C] mb-1">{product.name}</h3>
                       <p className="text-[#2D1F1C]/80 mb-4">{hasSizePricing(product, region) ? `from $${getBasePrice(product, region).toFixed(2)}` : `$${getBasePrice(product, region).toFixed(2)}`}</p>
                     </Link>
-                    {product.category !== 'Originals' && ((product.sizes && product.sizes.length > 0) || (product.colors && product.colors.length > 0)) ? (
-                      <Link to={`/shop/${product.slug}`}
-                        className="mt-auto flex items-center justify-center w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
+                    {region === 'Other' ? (
+                      <Link to="/contact"
+                        className="mt-auto flex items-center justify-center w-full bg-[#EAE6DF] hover:bg-[#DED9D0] text-[#2D1F1C] py-3 rounded-full font-medium transition-colors"
                       >
-                        See Options
+                        Contact me
                       </Link>
                     ) : (
-                      <button onClick={() => addToCart(product, 1, undefined, undefined, getBasePrice(product, region))}
-                        className="mt-auto w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
-                      >
-                        Add to Cart
-                      </button>
+                      product.category !== 'Originals' && ((product.sizes && product.sizes.length > 0) || (product.colors && product.colors.length > 0)) ? (
+                        <Link to={`/shop/${product.slug}`}
+                          className="mt-auto flex items-center justify-center w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
+                        >
+                          See Options
+                        </Link>
+                      ) : (
+                        <button onClick={() => addToCart(product, 1, undefined, undefined, getBasePrice(product, region))}
+                          className="mt-auto w-full bg-[#779C91] hover:bg-[#5E857A] text-white py-3 rounded-full font-medium transition-colors"
+                        >
+                          Add to Cart
+                        </button>
+                      )
                     )}
                   </div>
                 </div>

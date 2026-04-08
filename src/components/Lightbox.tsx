@@ -10,9 +10,9 @@ interface LightboxProps {
   medium?: string;
   dimensions?: string;
   status?: 'Available' | 'Sold' | 'Commissioned';
-  price?: number;
   isOpen: boolean;
   onClose: () => void;
+  price?: number;
 }
 
 export function Lightbox({
@@ -23,9 +23,9 @@ export function Lightbox({
   medium,
   dimensions,
   status,
-  price,
   isOpen,
   onClose,
+  price,
 }: LightboxProps) {
   if (!isOpen) return null;
 
@@ -55,7 +55,7 @@ export function Lightbox({
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={
             hasDetails
-              ? 'relative max-w-full max-h-full flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10'
+               ? 'relative max-w-full max-h-full flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10'
               : 'relative max-w-full max-h-full flex flex-col items-center'
           }
           onClick={(e) => e.stopPropagation()}
@@ -91,12 +91,12 @@ export function Lightbox({
                 </p>
               )}
 
-              {/* Price or Status */}
-              {(status === 'Sold' || status === 'Commissioned' || (status === 'Available' && price)) && (
-                <p className="text-white/50 text-sm mt-3 tracking-wide italic">
-                  {status === 'Sold' ? 'Sold' : status === 'Commissioned' ? 'Commissioned' : `$${price?.toLocaleString()}`}
+              {/* Price / Sold Display */}
+              <div className="mt-5 pt-4 border-t border-white/10">
+                <p className="text-white/50 text-sm tracking-wide">
+                  {status === 'Sold' ? 'Sold' : price ? `$${price.toLocaleString()}` : null}
                 </p>
-              )}
+              </div>
             </div>
           ) : (
             <p className="text-white/80 mt-6 text-lg font-serif tracking-wide">

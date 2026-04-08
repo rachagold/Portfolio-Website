@@ -3,14 +3,21 @@ import { AnimatedSection } from '../../components/AnimatedSection';
 import { paintings } from '../../data/paintings';
 import { Lightbox } from '../../components/Lightbox';
 import { Link } from 'react-router-dom';
+import { Painting } from '../../lib/types';
+import { originalArtworks } from '../../data/originalArtworks';
 
 export function Commissions() {
-  const [lightboxPainting, setLightboxPainting] = useState<any | null>(null);
+  const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
 
   const commissions = paintings.filter(p => p.collection === 'Commissions');
 
-  const handleImageClick = (painting: typeof paintings[0]) => {
+  const handleImageClick = (painting: Painting) => {
     setLightboxPainting(painting);
+  };
+
+  const getProductPrice = (title: string) => {
+    const product = originalArtworks.find(p => p.name === title);
+    return product?.price;
   };
 
   return (
@@ -30,8 +37,8 @@ export function Commissions() {
                 <img src={painting.image} alt={painting.title} loading="lazy" className="w-full h-auto block rounded-xl group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
               </div>
               <div>
-                <p className="text-[#2D1F1C]/60 text-sm uppercase tracking-widest mb-1">{painting.year}</p>
                 <h3 className="text-3xl font-serif text-[#93312A] mb-2">{painting.title}</h3>
+                <p className="text-[#2D1F1C]/80">{painting.year}</p>
               </div>
             </div>
           </AnimatedSection>
@@ -55,12 +62,12 @@ export function Commissions() {
           isOpen={!!lightboxPainting}
           image={lightboxPainting.image}
           title={lightboxPainting.title}
-          description={lightboxPainting.description}
           year={lightboxPainting.year}
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
           status={lightboxPainting.status}
-          price={lightboxPainting.price}
+          description={lightboxPainting.description}
+          price={getProductPrice(lightboxPainting.title)}
           onClose={() => setLightboxPainting(null)}
         />
       )}
