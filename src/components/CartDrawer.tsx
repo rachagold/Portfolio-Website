@@ -40,9 +40,9 @@ export function CartDrawer() {
         const result = await (stripe as any).redirectToCheckout({ sessionId: session.id });
         if (result?.error) console.error(result.error);
       }
-    } catch (err) {
-      console.error(err);
-      alert('Checkout failed. Please try again.');
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(`Checkout failed: ${err.message || 'Unknown error'}`);
     }
   };
   // --- STRIPE LOGIC END ---
