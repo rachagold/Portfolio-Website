@@ -113,6 +113,17 @@ async function startServer() {
     }
   });
 
+  // Stripe Checkout route
+  app.post("/api/checkout", async (req, res) => {
+    try {
+      const { default: handler } = await import("./api/checkout.ts");
+      await handler(req, res);
+    } catch (error) {
+      console.error("Checkout Handler Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
