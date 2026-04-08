@@ -174,7 +174,7 @@ export function Cambodia() {
                         <h3 className="text-xl font-serif text-[#2D1F1C] mb-2">{painting.title}</h3>
                         <p className="text-sm text-[#2D1F1C]/70 mb-2">{painting.year} · {painting.medium}</p>
                         {painting.description && (
-                          <p className="text-sm text-[#2D1F1C]/60 leading-relaxed italic">
+                          <p className="text-sm text-[#2D1F1C]/60 leading-relaxed italic line-clamp-2">
                             {painting.description}
                           </p>
                         )}

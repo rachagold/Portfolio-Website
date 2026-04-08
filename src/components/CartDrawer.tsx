@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { useCart } from './CartProvider';
+import { motion } from 'framer-motion';
 import { X, ShoppingBag } from 'lucide-react';
+import { stripePromise } from '../utils/stripe';
+import { useCart } from './CartProvider';
 
 export function CartDrawer() {
   const { isCartOpen, setIsCartOpen, items, removeFromCart, cartTotal, region } = useCart();
@@ -9,6 +10,42 @@ export function CartDrawer() {
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const hasOriginals = items.some((i) => i.product.category === 'Originals');
+
+  // --- STRIPE LOGIC START ---
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            name: item.product.name,
+            price: item.unitPrice || item.product.price,
+            quantity: item.quantity,
+            image: item.product.image
+          })),
+          region: region
+        }),
+      });
+
+      const session = await response.json();
+      if (session.error) throw new Error(session.error);
+
+      if (session.url) {
+        window.location.href = session.url;
+      } else {
+        // Fallback: use stripePromise redirectToCheckout (legacy)
+        const stripe = await stripePromise;
+        if (!stripe) throw new Error('Stripe failed to load.');
+        const result = await (stripe as any).redirectToCheckout({ sessionId: session.id });
+        if (result?.error) console.error(result.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Checkout failed. Please try again.');
+    }
+  };
+  // --- STRIPE LOGIC END ---
 
   if (!isCartOpen) return null;
 
@@ -61,6 +98,7 @@ export function CartDrawer() {
               <span className="text-xl text-[#2D1F1C]">Subtotal:</span>
               <span className="text-2xl font-medium text-[#2D1F1C]">${cartTotal.toFixed(2)}</span>
             </div>
+
             {!showCheckout ? (
               <button
                 onClick={() => setShowCheckout(true)}
@@ -68,25 +106,15 @@ export function CartDrawer() {
               >
                 Checkout
               </button>
-            ) : region === 'Cambodia' && !hasOriginals ? (
+            ) : (region === 'International' || region === 'Canada') ? (
+              /* STRIPE BRANCH */
               <div className="space-y-4">
-                <h3 className="text-xl font-serif text-[#93312A]">Complete Your Order</h3>
-                <div className="flex justify-center">
-                  <img
-                    src="/images/cambodia-qr-code.png"
-                    alt="KHQR"
-                    className="w-24 h-24 rounded-md mix-blend-multiply"
-                  />
-                </div>
-                <p className="text-sm text-[#2D1F1C]">
-                  Scan the KHQR code with your banking app, then send a screenshot to rachagold.art@gmail.com with your order details.
-                </p>
-                <a
-                  href="mailto:rachagold.art@gmail.com?subject=Order+Confirmation"
-                  className="block w-full py-3 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-center"
+                <button
+                  onClick={handleCheckout}
+                  className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg"
                 >
-                  Message Rachel
-                </a>
+                  Pay with Card ({region === 'Canada' ? 'CAD' : 'USD'})
+                </button>
                 <button
                   onClick={() => setShowCheckout(false)}
                   className="w-full text-sm text-[#2D1F1C]/60 hover:text-[#2D1F1C] transition-colors"
@@ -94,119 +122,46 @@ export function CartDrawer() {
                   Back to Cart
                 </button>
               </div>
+            ) : region === 'Cambodia' && !hasOriginals ? (
+              /* KHQR BRANCH */
+              <div className="space-y-4">
+                <h3 className="text-xl font-serif text-[#93312A]">Complete Your Order</h3>
+                <div className="flex justify-center">
+                  <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-24 h-24 rounded-md mix-blend-multiply" />
+                </div>
+                <p className="text-sm text-[#2D1F1C]">Scan the KHQR code then email a screenshot to confirm.</p>
+                <a href="mailto:rachagold.art@gmail.com?subject=Order+Confirmation" className="block w-full py-3 bg-[#779C91] text-white rounded-full font-medium text-center">Message Rachel</a>
+                <button onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors">Back to Cart</button>
+              </div>
             ) : (
+              /* PREORDER BRANCH */
               <div className="space-y-4">
                 <h3 className="text-xl font-serif text-[#93312A]">Preorder</h3>
-                <p className="text-sm text-[#2D1F1C]">
-                  {region === 'International'
-                    ? "International orders will not be delivered until July 2026. You can preorder now until June 5th."
-                    : "Original artworks are reserved via preorder. No payment is collected at checkout — Rachel will reach out to confirm details."}
-                </p>
-                {preorderStatus === 'success' ? (
-                  <div className="bg-[#779C91]/20 text-[#2D1F1C] p-4 rounded-xl text-center">
-                    <p className="font-medium">Preorder received!</p>
-                    <p className="text-sm mt-1">Rachel will be in touch to confirm your order.</p>
-                  </div>
-                ) : (
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setPreorderStatus('submitting');
-                      try {
-                        const res = await fetch('/api/waitlist', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            name: preorderData.name,
-                            email: preorderData.email,
-                            phone: preorderData.phone,
-                            contactMethod: preorderData.contactMethod,
-                            items: items.map(item => ({
-                              name: item.product.name,
-                              quantity: item.quantity,
-                              size: item.selectedSize || null,
-                              color: item.selectedColor || null,
-                              price: item.unitPrice || item.product.price,
-                            })),
-                            cartTotal,
-                          }),
-                        });
-                        if (res.ok) {
-                          setPreorderStatus('success');
-                          setPreorderData({ name: '', email: '', phone: '', contactMethod: 'whatsapp' });
-                        } else {
-                          setPreorderStatus('error');
-                        }
-                      } catch {
-                        setPreorderStatus('error');
-                      }
-                    }}
-                    className="space-y-3"
-                  >
-                    <input
-                      type="text"
-                      required
-                      placeholder="Your name"
-                      value={preorderData.name}
-                      onChange={(e) => setPreorderData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 text-[#2D1F1C] placeholder-[#2D1F1C]/40 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"
-                    />
-                    <input
-                      type="email"
-                      required
-                      placeholder="Email address"
-                      value={preorderData.email}
-                      onChange={(e) => setPreorderData(prev => ({ ...prev, email: e.target.value }))}
-                      className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 text-[#2D1F1C] placeholder-[#2D1F1C]/40 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"
-                    />
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contactMethod"
-                          checked={preorderData.contactMethod === 'whatsapp'}
-                          onChange={() => setPreorderData(prev => ({ ...prev, contactMethod: 'whatsapp' }))}
-                          className="w-4 h-4 accent-[#779C91]"
-                        />
-                        <span className="text-sm text-[#2D1F1C]">WhatsApp</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contactMethod"
-                          checked={preorderData.contactMethod === 'phone'}
-                          onChange={() => setPreorderData(prev => ({ ...prev, contactMethod: 'phone' }))}
-                          className="w-4 h-4 accent-[#779C91]"
-                        />
-                        <span className="text-sm text-[#2D1F1C]">Phone</span>
-                      </label>
-                    </div>
-                    <input
-                      type="tel"
-                      required
-                      placeholder={preorderData.contactMethod === 'whatsapp' ? 'WhatsApp number' : 'Phone number'}
-                      value={preorderData.phone}
-                      onChange={(e) => setPreorderData(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 text-[#2D1F1C] placeholder-[#2D1F1C]/40 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"
-                    />
-                    <button
-                      type="submit"
-                      disabled={preorderStatus === 'submitting'}
-                      className="w-full py-3 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors disabled:opacity-70"
-                    >
-                      {preorderStatus === 'submitting' ? 'Submitting...' : 'Place Preorder'}
-                    </button>
-                    {preorderStatus === 'error' && (
-                      <p className="text-red-600 text-sm text-center">Something went wrong. Please try again.</p>
-                    )}
-                  </form>
-                )}
-                <button
-                  onClick={() => setShowCheckout(false)}
-                  className="w-full text-sm text-[#2D1F1C]/60 hover:text-[#2D1F1C] transition-colors"
-                >
-                  Back to Cart
-                </button>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setPreorderStatus('submitting');
+                  try {
+                    const res = await fetch('/api/waitlist', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: preorderData.name,
+                        email: preorderData.email,
+                        phone: preorderData.phone,
+                        contactMethod: preorderData.contactMethod,
+                        items: items.map(item => ({ name: item.product.name, quantity: item.quantity })),
+                        cartTotal,
+                      }),
+                    });
+                    if (res.ok) { setPreorderStatus('success'); setPreorderData({ name: '', email: '', phone: '', contactMethod: 'whatsapp' }); }
+                    else { setPreorderStatus('error'); }
+                  } catch { setPreorderStatus('error'); }
+                }} className="space-y-3">
+                  <input type="text" required placeholder="Name" value={preorderData.name} onChange={(e) => setPreorderData(prev => ({ ...prev, name: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                  <input type="email" required placeholder="Email" value={preorderData.email} onChange={(e) => setPreorderData(prev => ({ ...prev, email: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                  <button type="submit" className="w-full py-3 bg-[#779C91] text-white rounded-full">Place Preorder</button>
+                </form>
+                <button onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors">Back to Cart</button>
               </div>
             )}
           </div>
