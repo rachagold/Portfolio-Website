@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 
+// Deploy Trigger: Syncing new environment variables
 export default async function handler(req: any, res: any) {
     // Only allow "POST" requests
     if (req.method !== 'POST') {
@@ -17,13 +18,13 @@ export default async function handler(req: any, res: any) {
     }
 
     // 2. Initialize Stripe
-    const stripe = new Stripe(secretKey);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
     // 3. Determine Base URL (Stripe requires absolute URLs)
     // Preference: SITE_URL > VERCEL_URL > Request Host
     const protocol = req.headers['x-forwarded-proto'] || 'http';
     const host = req.headers.host;
-    const baseUrl = process.env.SITE_URL 
+    const baseUrl = process.env.SITE_URL
         ? (process.env.SITE_URL.startsWith('http') ? process.env.SITE_URL : `https://${process.env.SITE_URL}`)
         : (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${protocol}://${host}`);
 
@@ -36,8 +37,8 @@ export default async function handler(req: any, res: any) {
             // Ensure images are absolute URLs
             let imageUrls: string[] = [];
             if (item.image) {
-                const img = item.image.startsWith('http') 
-                    ? item.image 
+                const img = item.image.startsWith('http')
+                    ? item.image
                     : `${baseUrl}${item.image.startsWith('/') ? '' : '/'}${item.image}`;
                 imageUrls.push(img);
             }
