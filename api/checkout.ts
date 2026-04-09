@@ -12,6 +12,8 @@ export default async function handler(req: any, res: any) {
 
     // 1. Validate environment variables
     const secretKey = process.env.STRIPE_SECRET_KEY;
+    console.log('Secret key exists:', !!secretKey); // Add this line
+    console.log('All env vars:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
     if (!secretKey) {
         console.error('Missing STRIPE_SECRET_KEY');
         return res.status(500).json({ error: 'Stripe configuration error: Missing Secret Key' });
