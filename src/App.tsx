@@ -8,6 +8,8 @@ import { Commissions } from './pages/portfolio/Commissions';
 import { OtherCountries } from './pages/portfolio/OtherCountries';
 import { Exhibition } from './pages/Exhibition';
 import { Shop } from './pages/shop/Shop';
+import { CollectionPage } from './pages/shop/CollectionPage';
+import { OriginalsGallery } from './pages/shop/OriginalsGallery';
 import { ProductDetail } from './pages/shop/ProductDetail';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
@@ -74,6 +76,8 @@ export default function App() {
           
           <Route element={<LocationGate />}>
             <Route path="shop" element={<Shop />} />
+            <Route path="shop/collection/:collectionSlug" element={<CollectionPage />} />
+            <Route path="shop/originals" element={<OriginalsGallery />} />
             <Route path="shop/:slug" element={<ProductDetail />} />
           </Route>
           

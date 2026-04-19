@@ -42,6 +42,16 @@ async function startServer() {
     }
   });
 
+  app.post("/api/cambodia-checkout", async (req, res) => {
+    try {
+      const { default: handler } = await import("./api/cambodia-checkout.ts");
+      await handler(req, res);
+    } catch (error) {
+      console.error("Cambodia Checkout Handler Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   // Stripe Checkout route
   app.post("/api/checkout", async (req, res) => {
     try {

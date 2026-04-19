@@ -17,10 +17,10 @@ export function Home() {
     description: '',
   });
 
-  const openLightbox = (painting: { image: string; title: string; year?: string; medium?: string; dimensions?: string; description?: string }) => {
+  const openLightbox = (painting: { image: string; highResImage: string; title: string; year?: string; medium?: string; dimensions?: string; description?: string }) => {
     setLightboxData({
       isOpen: true,
-      image: painting.image,
+      image: painting.highResImage,
       title: painting.title,
       year: painting.year ?? '',
       medium: painting.medium ?? '',
@@ -39,7 +39,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pointer-events-none">
           <AnimatedSection direction="right" className="order-2 lg:order-1 w-full h-full">
             <Link to="/portfolio/cambodia#russian-market-ii" className="block relative w-full h-[60vh] lg:h-[85vh] py-8 lg:py-12 pointer-events-auto">
-              <img src="/images/paintings/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
+              <img src="/images/paintings/No Watermarks/cambodia/russian_market_ii.png" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
             </Link>
           </AnimatedSection>
 
@@ -72,11 +72,11 @@ export function Home() {
 
             <div className="relative z-10">
               <span className="inline-block bg-white text-[#93312A] text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
-                Now Showing
+                Closing Ceremony
               </span>
               <h2 className="text-3xl md:text-4xl font-serif mb-2">Sra'Art: Geo Graphic</h2>
-              <p className="text-white/80 text-sm mb-1">March 5 - April 20, 2026 | Phnom Penh, Cambodia</p>
-              <p className="text-white/70 text-sm max-w-md">The interaction of observed landscapes, modern design, and organic subjects.</p>
+              <p className="text-white/80 text-sm mb-1">Final Day: May 1, 2026 | Phnom Penh, Cambodia</p>
+              <p className="text-white/70 text-sm max-w-md">Last chance to view the Geo Graphic collection before it closes forever on May 1.</p>
             </div>
 
             <Link to="/exhibition" className="relative z-10 whitespace-nowrap bg-[#779C91] hover:bg-[#5E857A] text-white px-8 py-3 rounded-full transition-colors font-medium">
@@ -180,13 +180,6 @@ export function Home() {
 
       {/* Merchandise Preview */}
       <section className="py-20 px-6 max-w-7xl mx-auto relative">
-        {/* Decorative background lines */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none">
-          <svg width="200" height="400" viewBox="0 0 100 200">
-            <path d="M0,100 L100,0 M0,100 L100,200" stroke="currentColor" strokeWidth="1" fill="none"/>
-            <circle cx="50" cy="100" r="40" stroke="currentColor" strokeWidth="1" fill="none"/>
-          </svg>
-        </div>
 
         <AnimatedSection>
           <h2 className="text-4xl font-serif text-[#2D1F1C] mb-4">Prints &amp; Wearables</h2>

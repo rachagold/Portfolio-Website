@@ -25,7 +25,7 @@ export function Exhibition() {
   const handleImageClick = (painting: typeof paintings[0]) => {
     setLightboxData({
       isOpen: true,
-      image: painting.image,
+      image: painting.highResImage,
       title: painting.title,
       year: painting.year,
       medium: painting.medium,
@@ -50,14 +50,14 @@ export function Exhibition() {
 
           <AnimatedSection direction="left" delay={0.2} className="order-1 lg:order-2">
             <span className="inline-block bg-[#779C91] text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-              Current Exhibition
+              Closing Ceremony
             </span>
             <h1 className="text-5xl md:text-7xl font-serif text-[#2D1F1C] mb-6 leading-tight">
               Sra'Art: Geo Graphic
             </h1>
             <div className="text-xl md:text-2xl text-[#2D1F1C]/80 mb-8 font-light">
-              <p className="mb-2">Opening Night: March 5, 2026</p>
-              <p className="mb-2">Running: March 5 - April 20, 2026</p>
+              <p className="mb-2 text-[#93312A] font-bold">Closing Ceremony: May 1, 2026</p>
+              <p className="mb-2">Final Day to view the collection: May 1, 2026</p>
               <p>Phnom Penh, Cambodia</p>
             </div>
           </AnimatedSection>
@@ -82,12 +82,12 @@ export function Exhibition() {
             <div className="bg-[#EAE6DF] rounded-3xl p-8 md:p-10 border border-[#93312A]/10">
               <div className="space-y-6 mb-10">
                 <div>
-                  <h3 className="font-bold text-[#2D1F1C] mb-1">Opening Night:</h3>
-                  <p className="text-[#2D1F1C]/80">March 5, 2026</p>
+                   <h3 className="font-bold text-[#2D1F1C] mb-1">Closing Ceremony:</h3>
+                   <p className="text-[#2D1F1C]/80">May 1, 2026</p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#2D1F1C] mb-1">Running:</h3>
-                  <p className="text-[#2D1F1C]/80">March 5 - April 20, 2026</p>
+                  <h3 className="font-bold text-[#2D1F1C] mb-1">Absolute Last Day:</h3>
+                  <p className="text-[#2D1F1C]/80">May 1, 2026</p>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#2D1F1C] mb-1">Location:</h3>
@@ -96,9 +96,9 @@ export function Exhibition() {
               </div>
 
               <div className="space-y-4">
-                <a href="https://www.facebook.com/events/" target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-[#779C91] hover:bg-[#5E857A] text-white px-8 py-4 rounded-full font-medium transition-colors">
-                  View Facebook Event
-                </a>
+                <p className="text-[#2D1F1C]/60 text-center py-4 italic border-t border-[#93312A]/10">
+                  Facebook event coming soon.
+                </p>
                 <Link to="/portfolio/cambodia" className="block w-full text-center bg-transparent border-2 border-[#93312A] text-[#93312A] hover:bg-[#93312A] hover:text-white px-8 py-4 rounded-full font-medium transition-colors">
                   See the Collection
                 </Link>

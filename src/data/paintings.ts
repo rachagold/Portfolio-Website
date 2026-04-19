@@ -1,7 +1,22 @@
 import { Painting } from '../lib/types';
 
+const PAINT_BASE = '/images/paintings';
+
+/**
+ * Helper to generate dual-quality image paths.
+ * Default: .jpg for No Watermarks (thumb), .png for Watermarks (full).
+ */
+function p(subfolder: string, filename: string, options: { t?: string; f?: string } = {}) {
+  const tExt = options.t || 'jpg';
+  const fExt = options.f || 'png';
+  return {
+    image: `${PAINT_BASE}/No Watermarks/${subfolder}/${filename}.${tExt}`,
+    highResImage: `${PAINT_BASE}/Watermarks/${subfolder}/${filename}.${fExt}`
+  };
+}
+
 export const paintings: Painting[] = [
-  // ─── Cambodia Main Series (6) ─────────────────────────────────────
+  // ─── Cambodia Main Series (8) ─────────────────────────────────────
   {
     id: 'c1',
     title: 'Russian Market 26',
@@ -11,7 +26,7 @@ export const paintings: Painting[] = [
     description: 'This rendition of the Russian Market scene captures the energy and rhythm that takes place below the vibrant roof tops. This piece emphasizes movement, liveliness and the flow of daily life in Cambodia. The translucent frame and the textured, stylized imagery allows the scene to pulse with activity and vibrancy.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/russian_market_ii.jpg',
+    ...p('cambodia', 'russian_market_ii', { t: 'png' }), // Special case: thumb is png or missing, but highRes definitely png
     status: 'Available'
   },
   {
@@ -23,7 +38,7 @@ export const paintings: Painting[] = [
     description: 'Koh Rong is a quiet, calming place. It has the rustic charm of a beach town, removed from the busyness of modern city life. Yet parts of the beach town have evolved in other ways. This piece evokes the spirit of the community that flows through Koh Rong, while the shapes suggest spontaneity, memories, and the liberating energy of travelers and their celebrations. This painting explores the balance between the calm of the coastal beach and the liberating energy of travelers, carefully navigating the edge before it tips into the overwhelm of holiday exuberance.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/koh_rong.jpg',
+    ...p('cambodia', 'koh_rong'),
     status: 'Available'
   },
   {
@@ -35,7 +50,7 @@ export const paintings: Painting[] = [
     description: 'Taking place in the old neighborhood of Daun Penh, this piece reflects the charm and character of the worn streets. Rustic textures and weathered surfaces are juxtaposed with delicate, light shapes creating a contrast between polished order and textured imperfection. This is meant to invite a reflection of how old and new, fragile and enduring, can coexist and enrich one another.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/daun_penh.jpg',
+    ...p('cambodia', 'daun_penh'),
     status: 'Available'
   },
   {
@@ -47,7 +62,7 @@ export const paintings: Painting[] = [
     description: 'Russian market is a vibrant, traditional marketplace where local daily life and tourism intersect. The opaque circle isolates a moment of calmness above the chaotic energy of the busy streets, while the surrounding geometric forms create order and structure. This piece was designed to invite reflection on whether these spaces should be reorganized to reduce the clutter and chaos, or preserved in their layered complexity and lively beauty.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/russian_market.jpg',
+    ...p('cambodia', 'russian_market'),
     status: 'Available'
   },
   {
@@ -59,7 +74,7 @@ export const paintings: Painting[] = [
     description: 'This piece uses geometric shapes to frame and enhance the natural scene. The shapes are carefully balanced to coexist with the landscape, to create structure and modernization without overpowering the organic qualities of the environment.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/phnom_aoral.jpg',
+    ...p('cambodia', 'phnom_aoral'),
     status: 'Available'
   },
   {
@@ -71,7 +86,7 @@ export const paintings: Painting[] = [
     description: 'This piece reflects Cambodian identity through familiar symbols. While the recognizable elements take center stage, the modern, non-Khmer skyline sits behind, big and bulky, impossible to ignore, setting a contemporary backdrop to the enduring staples of Khmer culture.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/independence.jpg',
+    ...p('cambodia', 'independence'),
     status: 'Available'
   },
   {
@@ -82,7 +97,7 @@ export const paintings: Painting[] = [
     description: 'This piece reflects a space that exists just beyond crowded streets and a nightly spectacle. People gather nearby, but remains outside the frame. Human presence exists is only suggested as the energy comes from the familiar market symbols, layered textures, and the rhythm of the city itself.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/battambang.jpg',
+    ...p('cambodia', 'battambang', { t: 'png' }), // Special case: only png in Watermarks, using it for both if thumb missing
     status: 'Available'
   },
   {
@@ -93,7 +108,7 @@ export const paintings: Painting[] = [
     description: 'This piece explores the coexistence of tradition and modern life through moments of visual and symbolic tension. The honor of a monk, yet absorbed by a phone; a traditional building against a modern skyscraper. The use of saffron orange, the color of a monk’s robe, symbolizing detachment from material desire, highlights how these values can feel at odds within a modern world.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    image: '/images/paintings/cambodia/phnom_penh_2026.jpg',
+    ...p('cambodia', 'phnom_penh_2026', { t: 'png' }), // thumb not in filesystem yet, using png as fallback
     status: 'Available'
   },
 
@@ -107,7 +122,7 @@ export const paintings: Painting[] = [
     description: 'The excess paint from the palette found a new purpose in this piece, maintaining the layers of textures to reflect a familiar look of weathered liveliness and rich vibrancy.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/russian_market_ii_ep.jpg',
+    ...p('cambodia', 'russian_market_ii_ep'),
     status: 'Available'
   },
   {
@@ -119,7 +134,7 @@ export const paintings: Painting[] = [
     description: 'The left over paint from Koh Rong went into this continuation of flow, free spirit and spontaneity.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/koh_rong_ep.jpg',
+    ...p('cambodia', 'koh_rong_ep'),
     status: 'Available'
   },
   {
@@ -131,7 +146,7 @@ export const paintings: Painting[] = [
     description: 'The left over paint from Koh Rong went into this continuation of flow, free spirit and spontaneity.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/koh_rong_ep_2.jpg',
+    ...p('cambodia', 'koh_rong_ep_2'),
     status: 'Available'
   },
   {
@@ -143,7 +158,7 @@ export const paintings: Painting[] = [
     description: 'The excess paint on the palette allowed for a light and textured artwork that explores a layering of imperfect and polished patterns. This piece creates a coexistence between organic, weathered patterns and crisp geometric shapes.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/daun_penh_ep.jpg',
+    ...p('cambodia', 'daun_penh_ep'),
     status: 'Available'
   },
   {
@@ -155,7 +170,7 @@ export const paintings: Painting[] = [
     description: 'This excess paint artwork revisits a captured calmness among what is known to be dynamic and energizing.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/russian_market_ep.jpg',
+    ...p('cambodia', 'russian_market_ep'),
     status: 'Available'
   },
   {
@@ -167,7 +182,7 @@ export const paintings: Painting[] = [
     description: 'The excess paint in this piece was left mostly as is to enhance its connection to the otherwise unique piece.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/independence_ep.jpg',
+    ...p('cambodia', 'independence_ep', { t: 'png' }), // Special case: ONLY in Watermarks as png
     status: 'Available'
   },
   {
@@ -178,7 +193,7 @@ export const paintings: Painting[] = [
     description: 'Light and dark can be seen in this piece where paint has been repurposed with the similar goal of blurring dusk into dawn maintaining high energy and vibrancy.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/battambang_ep.jpg',
+    ...p('cambodia', 'battambang_ep'),
     status: 'Available'
   },
   {
@@ -190,7 +205,7 @@ export const paintings: Painting[] = [
     description: 'The renewed paint in this piece is used to explore a similar balance and coexistence of organic and carefully placed strokes.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    image: '/images/paintings/cambodia/phnom_aoral_ep.jpg',
+    ...p('cambodia', 'phnom_aoral_ep'),
     status: 'Available'
   },
 
@@ -203,7 +218,7 @@ export const paintings: Painting[] = [
     dimensions: '45.5x53',
     description: 'Temples once so grounded and balanced within natural landscapes of South Korea now recomposed by rigid, rectangular shapes. This piece explores the point when interaction and fusion shift into obstruction and constraint.',
     collection: 'Korea',
-    image: '/images/paintings/korea/jeju_ii.jpg',
+    ...p('korea', 'jeju_ii'),
     status: 'Available'
   },
   {
@@ -213,7 +228,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Canvas',
     dimensions: '45.5x53',
     collection: 'Korea',
-    image: '/images/paintings/korea/namhansanseong.jpg',
+    ...p('korea', 'namhansanseong'),
     status: 'Sold'
   },
   {
@@ -224,7 +239,7 @@ export const paintings: Painting[] = [
     dimensions: '53x45.5',
     description: 'Inspired by the vibrant and delicate Joseon Dynasty temples — designed to be integrated into the natural surroundings and now framed by the perfectly constructed skyscrapers of modern times — this piece represents Korea\'s ongoing fusion of tradition and contemporary.',
     collection: 'Korea',
-    image: '/images/paintings/korea/jeju.jpg',
+    ...p('korea', 'jeju'),
     status: 'Available'
   },
   {
@@ -235,7 +250,7 @@ export const paintings: Painting[] = [
     dimensions: '72.5 x 60.5',
     description: 'Namisan is romantic, energetic, and youthful. While its cultural and historical roots paint a backdrop to the scene, Nami island has been transformed into a tourist destination celebrated for its art, media and romantic appeal. This piece captures the fluidity, energy, and artistic spirit of the island, reflecting the reality of lived moments and curated beauty.',
     collection: 'Korea',
-    image: '/images/paintings/korea/nami_island.jpg',
+    ...p('korea', 'nami_island', { t: 'jpg', f: 'png' }),
     status: 'Available'
   },
   {
@@ -245,7 +260,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on canvas',
     dimensions: '45.5x53',
     collection: 'Korea',
-    image: '/images/paintings/korea/nowon_gu.jpg',
+    ...p('korea', 'nowon_gu'),
     status: 'Available'
   },
   {
@@ -255,7 +270,16 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on canvas',
     dimensions: '45.5x53',
     collection: 'Korea',
-    image: '/images/paintings/korea/dobongsan.jpg',
+    ...p('korea', 'dobongsan'),
+    status: 'Available'
+  },
+  {
+    id: 'k7',
+    title: 'Myeongdong',
+    year: '2024',
+    medium: 'Acrylic on canvas',
+    collection: 'Korea',
+    ...p('korea', 'Myeongdong', { t: 'png' }), // Special case: PNG in both
     status: 'Available'
   },
 
@@ -267,7 +291,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Panel',
     dimensions: '30x45cm',
     collection: 'Commissions',
-    image: '/images/paintings/commissions/odaesan.jpg',
+    ...p('commissions', 'odaesan', { f: 'jpg' }), // Special case: JPG in both
     status: 'Commissioned'
   },
   {
@@ -277,7 +301,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Canvas',
     dimensions: '90x60cm',
     collection: 'Commissions',
-    image: '/images/paintings/commissions/banchan.jpg',
+    ...p('commissions', 'banchan', { f: 'jpg' }), // Special case: JPG in both
     status: 'Commissioned'
   },
 
@@ -289,7 +313,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Canvas',
     dimensions: '90x60cm',
     collection: 'Other Countries',
-    image: '/images/paintings/other-countries/golden_ganesha.jpg',
+    ...p('other-countries', 'golden_ganesha'),
     status: 'Available'
   },
   {
@@ -299,7 +323,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Paper',
     dimensions: '52x38cm',
     collection: 'Other Countries',
-    image: '/images/paintings/other-countries/bangkok.jpg',
+    ...p('other-countries', 'bangkok', { f: 'jpg' }), // Special case: JPG in both
     status: 'Available'
   },
   {
@@ -309,7 +333,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Panel',
     dimensions: '24x33cm',
     collection: 'Other Countries',
-    image: '/images/paintings/other-countries/rocky_mountain.jpg',
+    ...p('other-countries', 'rocky_mountain'),
     status: 'Available'
   }
 ];

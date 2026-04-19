@@ -60,7 +60,7 @@ export function Commissions() {
       {lightboxPainting && (
         <Lightbox
           isOpen={!!lightboxPainting}
-          image={lightboxPainting.image}
+          image={lightboxPainting.highResImage}
           title={lightboxPainting.title}
           year={lightboxPainting.year}
           medium={lightboxPainting.medium}

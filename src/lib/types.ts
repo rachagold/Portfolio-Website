@@ -28,7 +28,8 @@ export interface Painting {
   description?: string;
   collection: 'Cambodia' | 'Korea' | 'Commissions' | 'Other Countries' | 'Other';
   subCollection?: 'Main Series' | 'Excess Paint';
-  image: string;
+  image: string; // Used as thumbnail
+  highResImage: string; // Used for lightbox/shop
   price?: number;
   status: 'Available' | 'Sold' | 'Commissioned';
 }

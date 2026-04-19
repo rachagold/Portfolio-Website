@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, ShoppingBag } from 'lucide-react';
+import { X, ShoppingBag, QrCode } from 'lucide-react';
 import { stripePromise } from '../utils/stripe';
 import { useCart } from './CartProvider';
 
@@ -9,6 +9,11 @@ export function CartDrawer() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  
+  // --- CAMBODIA STATE ---
+  const [cambodiaStep, setCambodiaStep] = useState<'contact' | 'payment' | 'aba_scan' | 'success'>('contact');
+  const [cambodiaDetails, setCambodiaDetails] = useState({ name: '', phone: '', deliveryLocation: '', contactMethod: 'whatsapp' });
+  const [isSubmittingCambodia, setIsSubmittingCambodia] = useState(false);
   const hasOriginals = items.some((i) => i.product.category === 'Originals');
 
   // --- STRIPE LOGIC START ---
@@ -122,16 +127,95 @@ export function CartDrawer() {
                   Back to Cart
                 </button>
               </div>
-            ) : region === 'Cambodia' && !hasOriginals ? (
-              /* KHQR BRANCH */
+            ) : region === 'Cambodia' ? (
+              /* CAMBODIA MULTI-STEP CHECKOUT BRANCH */
               <div className="space-y-4">
-                <h3 className="text-xl font-serif text-[#93312A]">Complete Your Order</h3>
-                <div className="flex justify-center">
-                  <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-24 h-24 rounded-md mix-blend-multiply" />
-                </div>
-                <p className="text-sm text-[#2D1F1C]">Scan the KHQR code then email a screenshot to confirm.</p>
-                <a href="mailto:rachagold.art@gmail.com?subject=Order+Confirmation" className="block w-full py-3 bg-[#779C91] text-white rounded-full font-medium text-center">Message Rachel</a>
-                <button onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors">Back to Cart</button>
+                {cambodiaStep === 'contact' && (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setIsSubmittingCambodia(true);
+                    try {
+                      const res = await fetch('/api/cambodia-checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          ...cambodiaDetails,
+                          items: items.map(item => ({ name: item.product.name, quantity: item.quantity, price: item.unitPrice || item.product.price, size: item.selectedSize, color: item.selectedColor })),
+                          cartTotal
+                        }),
+                      });
+                      if (res.ok) setCambodiaStep('payment');
+                      else alert('Failed to save details. Please try again.');
+                    } catch {
+                      alert('An error occurred. Please try again.');
+                    } finally {
+                      setIsSubmittingCambodia(false);
+                    }
+                  }} className="space-y-4">
+                    <h3 className="text-xl font-serif text-[#93312A]">Delivery Details</h3>
+                    <input type="text" required placeholder="Full Name" value={cambodiaDetails.name} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, name: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                    <div>
+                      <p className="text-sm text-[#2D1F1C]/70 mb-2 px-1">Preferred Contact Method:</p>
+                      <div className="flex gap-4 px-1 mb-3">
+                        {['whatsapp', 'telegram', 'imessage'].map(method => (
+                          <label key={method} className="flex items-center gap-2 cursor-pointer text-sm text-[#2D1F1C]">
+                            <input type="radio" value={method} checked={cambodiaDetails.contactMethod === method} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, contactMethod: e.target.value }))} className="accent-[#93312A]" />
+                            <span className="capitalize">{method === 'imessage' ? 'iMessage' : method}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <input type="tel" required placeholder="Phone Number" value={cambodiaDetails.phone} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, phone: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                    </div>
+                    <div>
+                      <input type="text" required placeholder="Delivery Location" value={cambodiaDetails.deliveryLocation} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, deliveryLocation: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                      <p className="text-xs text-[#2D1F1C]/60 mt-1 px-1">Physical address, Google Maps link, or Grab link.</p>
+                    </div>
+                    <button type="submit" disabled={isSubmittingCambodia} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] disabled:opacity-50 text-white rounded-full font-medium transition-colors text-lg">
+                      {isSubmittingCambodia ? 'Processing...' : 'Continue to Payment'}
+                    </button>
+                    <button type="button" onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors">Back to Cart</button>
+                  </form>
+                )}
+                {cambodiaStep === 'payment' && (
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-serif text-[#93312A]">Select Payment</h3>
+                    <button id="stripe_test_id" onClick={handleCheckout} className="w-full py-4 bg-[#2D1F1C] hover:bg-black text-white rounded-full font-medium transition-colors text-lg">
+                      Credit Card
+                    </button>
+                    <button onClick={() => {
+                        setCambodiaStep('aba_scan');
+                      }} className="w-full py-4 bg-[#005a92] hover:bg-[#004875] text-white rounded-full font-medium transition-colors text-lg flex items-center justify-center gap-3">
+                      <QrCode className="w-5 h-5" />
+                      <span>ABA Pay</span>
+                      <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-6 h-6 rounded-sm bg-white p-0.5" />
+                    </button>
+                    <button onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors mt-2">Cancel</button>
+                  </div>
+                )}
+                {cambodiaStep === 'aba_scan' && (
+                  <div className="space-y-4 text-center">
+                    <h3 className="text-xl font-serif text-[#93312A]">Scan to Pay</h3>
+                    <div className="flex justify-center bg-white p-4 rounded-xl border border-gray-200">
+                      <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-48 h-48 sm:w-64 sm:h-64 rounded-md object-contain" />
+                    </div>
+                    <p className="text-sm text-[#2D1F1C]">Open your ABA app and scan the QR code above to complete your payment.</p>
+                    <button onClick={() => setCambodiaStep('success')} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg mt-4">
+                      I have completed payment
+                    </button>
+                    <button onClick={() => setCambodiaStep('payment')} className="w-full text-sm text-[#2D1F1C]/60 transition-colors mt-2">Back to Payment Options</button>
+                    <button onClick={() => setShowCheckout(false)} className="w-full text-sm text-[#2D1F1C]/60 transition-colors mt-2">Return to Cart</button>
+                  </div>
+                )}
+                {cambodiaStep === 'success' && (
+                  <div className="space-y-6 text-center py-8">
+                    <div className="w-16 h-16 bg-[#779C91]/20 text-[#779C91] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <QrCode className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-serif text-[#93312A]">Order Placed!</h3>
+                    <p className="text-[#2D1F1C]">We will reach out shortly to confirm payment and coordinate delivery.</p>
+                    <button onClick={() => setIsCartOpen(false)} className="w-full py-3 bg-[#779C91] text-white rounded-full mt-4">Close Cart</button>
+                  </div>
+                )}
               </div>
             ) : (
               /* PREORDER BRANCH */

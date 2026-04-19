@@ -8,6 +8,7 @@ export function Contact() {
     lastName: '',
     email: '',
     phone: '',
+    preferredContact: '',
     subject: 'Purchase Inquiry',
     message: '',
     subscribe: false
@@ -44,6 +45,7 @@ export function Contact() {
           lastName: '',
           email: '',
           phone: '',
+          preferredContact: '',
           subject: 'Purchase Inquiry',
           message: '',
           subscribe: false
@@ -99,9 +101,30 @@ export function Contact() {
                   <label htmlFor="email" className="block text-[#2D1F1C] font-medium mb-2">Email</label>
                   <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"/>
                 </div>
-                <div>
-                  <label htmlFor="phone" className="block text-[#2D1F1C] font-medium mb-2">Phone / WhatsApp</label>
-                  <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"/>
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <label className="block text-[#2D1F1C] text-sm mb-2">Preferred App (Required if phone provided)</label>
+                    <div className="flex flex-wrap items-center gap-4">
+                      {['Telegram', 'Apple iMessage', 'WhatsApp'].map((method) => (
+                        <label key={method} className="flex items-center gap-2 text-[#2D1F1C]/80 text-sm cursor-pointer whitespace-nowrap">
+                          <input 
+                            type="radio" 
+                            name="preferredContact" 
+                            value={method} 
+                            checked={formData.preferredContact === method} 
+                            onChange={handleChange} 
+                            required={!!formData.phone} 
+                            className="bg-transparent border-[#93312A]/30 text-[#93312A] focus:ring-[#93312A] cursor-pointer"
+                          />
+                          {method}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-[#2D1F1C] font-medium mb-2">Phone</label>
+                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"/>
+                  </div>
                 </div>
               </div>
 

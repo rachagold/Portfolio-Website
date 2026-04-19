@@ -191,7 +191,7 @@ export function Cambodia() {
       {lightboxPainting && (
         <Lightbox
           isOpen={!!lightboxPainting}
-          image={lightboxPainting.image}
+          image={lightboxPainting.highResImage}
           title={lightboxPainting.title}
           description={lightboxPainting.description}
           year={lightboxPainting.year}
