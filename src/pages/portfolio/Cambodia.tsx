@@ -104,7 +104,7 @@ export function Cambodia() {
           {activeTab === 'Excess Paint' ? (
             <div className="text-center mb-16">
               <h1 className="text-5xl md:text-6xl font-serif text-[#2D1F1C] mb-6">Excess Paint Collection</h1>
-              <p className="max-w-3xl mx-auto text-[#2D1F1C]/80 text-lg leading-relaxed italic">
+              <p className="max-w-3xl mx-auto text-[#2D1F1C]/80 text-lg leading-relaxed">
                 Excess Paint Collection — Nothing goes to waste. Leftover paint from each piece is repurposed into smaller works that explore texture, color, and composition on their own terms.
               </p>
             </div>
