@@ -39,7 +39,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pointer-events-none">
           <AnimatedSection direction="right" className="order-2 lg:order-1 w-full h-full">
             <Link to="/portfolio/cambodia#russian-market-ii" className="block relative w-full h-[60vh] lg:h-[85vh] py-8 lg:py-12 pointer-events-auto">
-              <img src="/images/paintings/No Watermarks/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
+              <img src="/images/paintings/No%20Watermarks/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
             </Link>
           </AnimatedSection>
 

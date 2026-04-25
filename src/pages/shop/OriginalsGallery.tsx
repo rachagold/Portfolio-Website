@@ -5,6 +5,8 @@ import { originalArtworks } from '../../data/originalArtworks';
 import { useCart } from '../../components/CartProvider';
 import { getBasePrice, getPriceRange } from '../../lib/pricing';
 import { ChevronRight } from 'lucide-react';
+import { truncateDescription } from '../../lib/utils';
+
 
 export function OriginalsGallery() {
   const { region } = useCart();
@@ -55,8 +57,8 @@ export function OriginalsGallery() {
               <div className="p-5">
                 <h3 className="font-serif text-lg text-[#2D1F1C] mb-1">{product.name}</h3>
                 {product.description && (
-                  <p className="text-[#2D1F1C]/60 text-sm leading-relaxed line-clamp-2 mb-3">
-                    {product.description}
+                  <p className="text-[#2D1F1C]/60 text-sm leading-relaxed mb-3">
+                    {truncateDescription(product.description, 110)}
                   </p>
                 )}
                 <p className="text-[#93312A] font-medium">

@@ -4,6 +4,8 @@ import { paintings } from '../../data/paintings';
 import { Lightbox } from '../../components/Lightbox';
 import { Painting } from '../../lib/types';
 import { originalArtworks } from '../../data/originalArtworks';
+import { truncateDescription } from '../../lib/utils';
+
 
 export function Korea() {
   const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
@@ -41,7 +43,7 @@ export function Korea() {
                 <p className="text-[#2D1F1C]/80">{painting.medium}</p>
                 <p className="text-[#2D1F1C]/60 text-sm mb-2">{painting.year}</p>
                 {painting.description && (
-                  <p className="text-sm text-[#2D1F1C]/60 leading-relaxed mt-2 line-clamp-2">{painting.description}</p>
+                  <p className="text-sm text-[#2D1F1C]/60 leading-relaxed mt-2">{truncateDescription(painting.description, 110)}</p>
                 )}
               </div>
             </div>
