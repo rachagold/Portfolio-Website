@@ -30,10 +30,10 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
   if (!forceOpen && location) return null;
 
   const locations = [
-    { name: 'United States', sub: 'English', loc: 'US', reg: 'International' },
-    { name: 'Canada', sub: 'English', loc: 'CA', reg: 'International' },
-    { name: 'Cambodia', sub: 'English', loc: 'KH', reg: 'Cambodia' },
-    { name: 'Other', sub: 'English', loc: 'Other', reg: 'Other' },
+    { name: 'United States', loc: 'US', reg: 'International' },
+    { name: 'Canada', loc: 'CA', reg: 'International' },
+    { name: 'Cambodia', loc: 'KH', reg: 'Cambodia' },
+    { name: 'Other', loc: 'Other', reg: 'Other' },
   ];
 
   return (
@@ -84,7 +84,6 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
                 </div>
                 <div>
                   <div className="text-2xl font-serif text-[#2D1F1C] group-hover:text-[#93312A] transition-colors">{item.name}</div>
-                  <div className="text-sm text-[#2D1F1C]/40 uppercase tracking-widest mt-1">{item.sub}</div>
                 </div>
               </motion.button>
             ))}

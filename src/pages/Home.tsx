@@ -39,7 +39,7 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 pointer-events-none">
           <AnimatedSection direction="right" className="order-2 lg:order-1 w-full h-full">
             <Link to="/portfolio/cambodia#russian-market-ii" className="block relative w-full h-[60vh] lg:h-[85vh] py-8 lg:py-12 pointer-events-auto">
-              <img src="/images/paintings/No Watermarks/cambodia/russian_market_ii.png" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
+              <img src="/images/paintings/No Watermarks/cambodia/russian_market_ii.jpg" alt="Russian Market ii" className="w-full h-full object-cover rounded-lg shadow-2xl" referrerPolicy="no-referrer"/>
             </Link>
           </AnimatedSection>
 
@@ -187,14 +187,19 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: 'Phnom Aoral Print', price: '$15.00', img: '/images/products/prints/phnom_aoral_print.png', slug: 'phnom-aoral-print' },
-              { title: 'Koh Rong EP T-Shirt', price: '$15.00', img: '/images/products/tshirts/koh_rong_ep_tshirt.png', slug: 'koh-rong-ep-t-shirt' },
-              { title: 'Jeju Tote Bag', price: '$16.00', img: '/images/products/totes/jeju_tote.png', slug: 'jeju-tote-bag' }
+              { title: 'Phnom Aoral — Prints', price: 'From $5.00', img: '/images/products/Phnom Aoral/Phnom Aoral - A3.png', slug: 'phnom-aoral-prints' },
+              { title: 'Koh Rong EP — Tee', price: '$30.00', img: '/images/products/Koh Rong EP/Koh Rong EP - Tee white.png', slug: 'koh-rong-ep-tees' },
+              { title: 'Jeju — Tote', price: '$30.00', img: '/images/products/Jeju/Jeju - Tote Beige.png', slug: 'jeju-totes' }
             ].map((item, i) => (
               <AnimatedSection key={i} delay={i * 0.1}>
                 <Link to={`/shop/${item.slug}`} className="group block">
-                  <div className="aspect-[4/5] rounded-2xl border border-[#93312A]/10 bg-white p-8 mb-4 flex items-center justify-center group-hover:border-[#93312A]/30 transition-colors">
-                    <img src={item.img} alt={item.title} className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-xl" referrerPolicy="no-referrer"/>
+                  <div className="aspect-[4/5] mb-6 flex items-center justify-center overflow-hidden">
+                    <img 
+                      src={item.img} 
+                      alt={item.title} 
+                      className="h-full w-full object-cover transition-transform duration-500 drop-shadow-2xl group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
                   <h3 className="font-medium text-[#2D1F1C]">{item.title}</h3>
                   <p className="text-[#2D1F1C]/70">{item.price}</p>

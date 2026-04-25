@@ -5,7 +5,7 @@ import { Lens } from '../../components/Lens';
 import { products } from '../../data/products';
 import { COLLECTIONS } from '../../data/collections';
 import { useCart } from '../../components/CartProvider';
-import { getPrice, getBasePrice } from '../../lib/pricing';
+import { getPrice, getBasePrice, getPriceRange } from '../../lib/pricing';
 import { ChevronRight, ChevronDown, Minus, Plus } from 'lucide-react';
 
 /** Resolve which collection (if any) a product belongs to, for breadcrumb */
@@ -138,9 +138,42 @@ export function ProductDetail() {
     addToCart(product, quantity, selectedColor, selectedSize, displayPrice);
   };
 
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id && p.category === product.category)
-    .slice(0, 4);
+  const sameCategoryProducts = products.filter(p => p.id !== product.id && p.category === product.category);
+  
+  let sameArtworkProducts: typeof products = [];
+  if (collectionCrumb) {
+    const currentCollection = COLLECTIONS.find(c => c.slug === collectionCrumb.href.split('/').pop());
+    if (currentCollection) {
+      const artworkSlugs = [
+        currentCollection.tiles.prints.slug,
+        currentCollection.tiles.tees.slug,
+        currentCollection.tiles.totes.slug,
+        currentCollection.tiles.original.slug
+      ];
+      sameArtworkProducts = products.filter(p => p.id !== product.id && artworkSlugs.includes(p.slug));
+    }
+  }
+
+  const leftItems = sameCategoryProducts.slice(0, 2);
+  const rightItems = sameArtworkProducts.filter(p => !leftItems.find(l => l.id === p.id)).slice(0, 2);
+
+  const bestSellersFallback = products.filter(p => 
+    p.id !== product.id && 
+    !leftItems.find(l => l.id === p.id) && 
+    !rightItems.find(r => r.id === p.id)
+  );
+
+  const finalLeft = [...leftItems];
+  const finalRight = [...rightItems];
+
+  while (finalLeft.length < 2 && bestSellersFallback.length > 0) {
+    finalLeft.push(bestSellersFallback.shift()!);
+  }
+  while (finalRight.length < 2 && bestSellersFallback.length > 0) {
+    finalRight.push(bestSellersFallback.shift()!);
+  }
+
+  const relatedProducts = [...finalLeft, ...finalRight];
 
   const increaseQuantity = () => setQuantity((prev) => prev + 1);
   const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -172,11 +205,11 @@ export function ProductDetail() {
           {hasImages ? (
             <>
               <Lens zoomFactor={2.5} lensSize={200}>
-                <div className="aspect-square bg-[#EAE6DF] rounded-2xl p-6 mb-4 flex items-center justify-center overflow-hidden">
+                <div className="aspect-square bg-transparent rounded-2xl p-6 mb-4 flex items-center justify-center overflow-hidden">
                   <img
                     src={product.images[safeActiveImage]}
                     alt={product.name}
-                    className="max-w-full max-h-full object-contain drop-shadow-xl transition-opacity duration-300"
+                    className="max-w-full max-h-full object-contain transition-opacity duration-300"
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -211,9 +244,9 @@ export function ProductDetail() {
                           ignoreSelectionEffects.current = false;
                         }, 50);
                       }}
-                      className={`w-20 h-20 flex-shrink-0 bg-[#EAE6DF] rounded-xl p-1.5 border-2 transition-all duration-300 snap-start ${
+                      className={`w-20 h-20 flex-shrink-0 bg-transparent rounded-xl p-1.5 border-2 transition-all duration-300 snap-start ${
                         safeActiveImage === i
-                          ? 'border-[#93312A] shadow-lg scale-105'
+                          ? 'border-[#93312A] scale-105'
                           : 'border-transparent hover:border-[#93312A]/30 hover:scale-105'
                       }`}
                     >
@@ -418,12 +451,17 @@ export function ProductDetail() {
                       <li><span className="font-medium">A2 (Large Poster):</span> 42 × 59.4 cm</li>
                       <li><span className="font-medium">A3 (Poster):</span> 29.7 × 42 cm</li>
                       <li><span className="font-medium">A4:</span> 21 × 29.7 cm</li>
+                    </ul>
+                  )}
+                  {product.category === 'Postcards' && (
+                    <ul className="space-y-1">
                       <li><span className="font-medium">A6 (Post card):</span> 10.5 × 14.8 cm</li>
                     </ul>
                   )}
                   {product.category !== 'T-shirts' &&
                     product.category !== 'Totes' &&
-                    product.category !== 'Prints' && (
+                    product.category !== 'Prints' &&
+                    product.category !== 'Postcards' && (
                       <p>Please refer to the size details listed for measurements specific to this product.</p>
                     )}
                 </div>
@@ -448,13 +486,29 @@ export function ProductDetail() {
       {/* Related products */}
       {relatedProducts.length > 0 && (
         <AnimatedSection>
-          <h2 className="text-3xl font-serif text-[#93312A] text-center mb-12">
-            You Might Also Like
-          </h2>
+          <div className="mb-8">
+            <h2 className="text-3xl font-serif text-[#93312A] text-center mb-10">
+              You Might Also Like
+            </h2>
+            <div className="grid grid-cols-2 gap-8 text-xs sm:text-sm font-medium uppercase tracking-widest text-[#2D1F1C]/70 border-b border-[#93312A]/10 pb-4">
+              <div className="text-center">
+                <Link to={`/shop/category/${product.category.toLowerCase()}`} className="hover:text-[#93312A] transition-colors">
+                  See All {product.category}
+                </Link>
+              </div>
+              <div className="text-center">
+                {collectionCrumb && (
+                  <Link to={collectionCrumb.href} className="hover:text-[#93312A] transition-colors">
+                    More from {collectionCrumb.name.replace(' Collection', '')}
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {relatedProducts.map((rp) => (
               <Link key={rp.id} to={`/shop/${rp.slug}`} className="group text-center">
-                <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-[#EAE6DF] group-hover:shadow-xl transition-all duration-300">
+                <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-transparent transition-all duration-300">
                   {rp.image ? (
                     <img
                       src={rp.image}
@@ -469,7 +523,7 @@ export function ProductDetail() {
                   )}
                 </div>
                 <h3 className="font-medium text-[#2D1F1C] mb-1 text-sm">{rp.name}</h3>
-                <p className="text-[#2D1F1C]/60 text-sm">${getBasePrice(rp, region).toFixed(2)}</p>
+                <p className="text-[#2D1F1C]/60 text-sm">{getPriceRange(rp, region)}</p>
               </Link>
             ))}
           </div>

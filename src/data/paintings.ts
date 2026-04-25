@@ -26,7 +26,7 @@ export const paintings: Painting[] = [
     description: 'This rendition of the Russian Market scene captures the energy and rhythm that takes place below the vibrant roof tops. This piece emphasizes movement, liveliness and the flow of daily life in Cambodia. The translucent frame and the textured, stylized imagery allows the scene to pulse with activity and vibrancy.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    ...p('cambodia', 'russian_market_ii', { t: 'png' }), // Special case: thumb is png or missing, but highRes definitely png
+    ...p('cambodia', 'russian_market_ii'), 
     status: 'Available'
   },
   {
@@ -182,7 +182,7 @@ export const paintings: Painting[] = [
     description: 'The excess paint in this piece was left mostly as is to enhance its connection to the otherwise unique piece.',
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
-    ...p('cambodia', 'independence_ep', { t: 'png' }), // Special case: ONLY in Watermarks as png
+    ...p('cambodia', 'independence_ep'),
     status: 'Available'
   },
   {

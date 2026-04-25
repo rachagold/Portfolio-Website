@@ -103,6 +103,10 @@ export function Contact() {
                 </div>
                 <div className="flex flex-col gap-3">
                   <div>
+                    <label htmlFor="phone" className="block text-[#2D1F1C] font-medium mb-2">Phone</label>
+                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"/>
+                  </div>
+                  <div>
                     <label className="block text-[#2D1F1C] text-sm mb-2">Preferred App (Required if phone provided)</label>
                     <div className="flex flex-wrap items-center gap-4">
                       {['Telegram', 'Apple iMessage', 'WhatsApp'].map((method) => (
@@ -120,10 +124,6 @@ export function Contact() {
                         </label>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <label htmlFor="phone" className="block text-[#2D1F1C] font-medium mb-2">Phone</label>
-                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3 focus:outline-none focus:border-[#93312A] focus:ring-1 focus:ring-[#93312A] transition-colors"/>
                   </div>
                 </div>
               </div>

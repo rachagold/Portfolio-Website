@@ -78,6 +78,7 @@ export const collectionProducts: Product[] = [
       p('Russian Market', 'Russian Market - Tee White 2.png'),
       p('Russian Market', 'Russian Market - Tee Black 2.png'),
       p('Russian Market', 'Russian Market - Tee Beige 2.png'),
+      p('Russian Market', 'Russian Market - Tee White 3.png'),
       p('Russian Market', 'Russian Market - Tee 2.png'),
     ],
     description: 'Soft cotton t-shirt featuring the Russian Market painting. 100% cotton, 250 GSM.',
@@ -246,6 +247,7 @@ export const collectionProducts: Product[] = [
       p('Jeju', 'Jeju - Tee Beige.png'),
       // secondary
       p('Jeju', 'Jeju - Tee white 2.png'),
+      p('Jeju', 'Jeju - Tee white 3.png'),
       p('Jeju', 'Jeju - Tee black 2.png'),
       p('Jeju', 'Jeju - Tee Beige 2.png'),
       p('Jeju', 'Jeju - Tee 2.png'),
@@ -336,6 +338,8 @@ export const collectionProducts: Product[] = [
       p('Koh Rong EP', 'Koh Rong EP - Tee beige.png'),
       // secondary
       p('Koh Rong EP', 'Koh Rong EP - Tee white 2.png'),
+      p('Koh Rong EP', 'Koh Rong EP - Tee white 3.png'),
+      p('Koh Rong EP', 'Koh Rong EP - Tee white 4.png'),
       p('Koh Rong EP', 'Koh Rong EP - Tee beige 2.png'),
       p('Koh Rong EP', 'Koh Rong EP - Tee 2.png'),
     ],
@@ -472,10 +476,13 @@ export const collectionProducts: Product[] = [
     price: 5,
     category: 'Prints',
     collection: 'Cambodia',
-    image: p('Independence', 'Independence - Post card.png'),
+    image: p('Independence', 'Independence - A4.png'),
     images: [
+      p('Independence', 'Independence - A4.png'),
+      p('Independence', 'Independence - A3.png'),
+      p('Independence', 'Independence - A2.png'),
       p('Independence', 'Independence - Post card.png'),
-      // secondary
+      p('Independence', 'Independence - Post card 2.png'),
       p('Independence', 'Independence - Print 2.png'),
     ],
     description: 'High quality glossy 300gsm prints of Independence Monument.',
@@ -483,6 +490,9 @@ export const collectionProducts: Product[] = [
     sizePrice: PRINT_PRICES,
     sizeImages: {
       'A6 (Post card)': p('Independence', 'Independence - Post card.png'),
+      'A4': p('Independence', 'Independence - A4.png'),
+      'A3 (Poster)': p('Independence', 'Independence - A3.png'),
+      'A2 (Large Poster)': p('Independence', 'Independence - A2.png'),
     },
     inStock: true,
   },
@@ -493,12 +503,22 @@ export const collectionProducts: Product[] = [
     price: 30,
     category: 'T-shirts',
     collection: 'Cambodia',
-    image: '',
-    images: [],
-    description: 'T-shirt featuring the Independence Monument painting. Coming soon.',
+    image: p('Independence', 'Independence - Tee white.png'),
+    hoverImage: p('Independence', 'Independence - Tee black.png'),
+    images: [
+      p('Independence', 'Independence - Tee white.png'),
+      p('Independence', 'Independence - Tee black.png'),
+      p('Independence', 'Independence - Tee beige.png'),
+    ],
+    description: 'Soft cotton t-shirt featuring the Independence Monument painting. 100% cotton, 250 GSM.',
     colors: ['White', 'Black', 'Beige'],
+    colorImages: {
+      White: p('Independence', 'Independence - Tee white.png'),
+      Black: p('Independence', 'Independence - Tee black.png'),
+      Beige: p('Independence', 'Independence - Tee beige.png'),
+    },
     sizes: TEE_SIZES,
-    inStock: false,
+    inStock: true,
   },
   {
     id: 'ind-totes',
@@ -535,12 +555,14 @@ export const collectionProducts: Product[] = [
     price: 5,
     category: 'Prints',
     collection: 'Cambodia',
-    image: '',
-    images: [],
-    description: 'High quality glossy 300gsm prints of Phnom Penh. Coming soon.',
+    image: p('Phnom Penh', 'Phnom Penh - Print 2.png'),
+    images: [
+      p('Phnom Penh', 'Phnom Penh - Print 2.png'),
+    ],
+    description: 'High quality glossy 300gsm prints of Phnom Penh.',
     sizes: PRINT_SIZES,
     sizePrice: PRINT_PRICES,
-    inStock: false,
+    inStock: true,
   },
   {
     id: 'pp-tees',
@@ -572,3 +594,57 @@ export const collectionProducts: Product[] = [
     inStock: false,
   },
 ];
+
+// ─────────────────────────────────────────────────────────────────
+// Programmatically split 'Postcards' from Prints
+// ─────────────────────────────────────────────────────────────────
+const postcards: Product[] = [];
+
+for (const p of collectionProducts) {
+  if (p.category === 'Prints' && p.sizes?.includes('A6 (Post card)')) {
+    // 1. Remove A6 from original Print definition
+    p.sizes = p.sizes.filter(s => s !== 'A6 (Post card)');
+    if (p.sizePrice && p.sizePrice['A6 (Post card)']) {
+      delete p.sizePrice['A6 (Post card)'];
+    }
+    if (p.sizeImages && p.sizeImages['A6 (Post card)']) {
+      delete p.sizeImages['A6 (Post card)'];
+    }
+    
+    // 2. Build new valid images array using fuzzy logic
+    const validImages = p.images.filter(img => {
+      const lower = img.toLowerCase();
+      return lower.includes('print 2') || 
+             lower.includes('post card') || 
+             lower.includes('postcard') || 
+             lower.includes('print.png');
+    });
+
+    // Strategy to pick image cover:
+    // User requested: "use 'Artwork - Post Card' as the primary thumbnail"
+    const primaryImage = validImages.find(img => 
+      img.toLowerCase().includes('post card') || 
+      img.toLowerCase().includes('postcard')
+    ) || validImages[0] || p.image;
+
+    const postcard: Product = {
+      ...p,
+      id: p.id.replace('prints', 'postcards'),
+      slug: p.slug.replace('prints', 'postcards'),
+      name: p.name.replace('Prints', 'Postcard'),
+      price: 5,
+      category: 'Postcards',
+      image: primaryImage,
+      images: validImages,
+      // Remove sizes altogether to reflect single product variation typical of postcards
+      sizes: [],
+      sizePrice: undefined,
+      sizeImages: undefined
+    };
+
+    postcards.push(postcard);
+  }
+}
+
+// Append newly generated postcards to main collection export
+collectionProducts.push(...postcards);

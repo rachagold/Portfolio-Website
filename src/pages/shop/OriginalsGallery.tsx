@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AnimatedSection } from '../../components/AnimatedSection';
 import { originalArtworks } from '../../data/originalArtworks';
 import { useCart } from '../../components/CartProvider';
-import { getBasePrice } from '../../lib/pricing';
+import { getBasePrice, getPriceRange } from '../../lib/pricing';
 import { ChevronRight } from 'lucide-react';
 
 export function OriginalsGallery() {
@@ -34,10 +34,10 @@ export function OriginalsGallery() {
           <AnimatedSection key={product.id} delay={i * 0.05} className="break-inside-avoid mb-6">
             <Link
               to={`/shop/${product.slug}`}
-              className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#93312A]/10"
+              className="group block bg-transparent rounded-2xl overflow-hidden transition-all duration-300 border border-transparent hover:border-[#93312A]/10"
             >
               {/* image */}
-              <div className="overflow-hidden bg-[#F5F0E8]">
+              <div className="overflow-hidden bg-transparent">
                 {product.image ? (
                   <img
                     src={product.image}
@@ -60,7 +60,7 @@ export function OriginalsGallery() {
                   </p>
                 )}
                 <p className="text-[#93312A] font-medium">
-                  ${getBasePrice(product, region).toLocaleString()}
+                  {getPriceRange(product, region)}
                 </p>
               </div>
             </Link>

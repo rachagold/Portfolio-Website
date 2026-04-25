@@ -49,3 +49,36 @@ export function hasSizePricing(
   if (region === 'International') return !!product.sizePrice;
   return !!CAMBODIA_SIZE[product.category];
 }
+
+/** Get the formatted price string (either single price or range) for thumbnails. */
+export function getPriceRange(
+  product: Product,
+  region: 'Cambodia' | 'International',
+): string {
+  let min = getBasePrice(product, region);
+  let max = min;
+
+  if (region === 'International') {
+    if (product.sizePrice) {
+      const prices = Object.values(product.sizePrice);
+      min = Math.min(min, ...prices);
+      max = Math.max(max, ...prices);
+    }
+  } else {
+    // Cambodia
+    const sizesMap = CAMBODIA_SIZE[product.category];
+    if (sizesMap && product.sizes && product.sizes.length > 0) {
+      const validSizes = product.sizes.filter(s => sizesMap[s] !== undefined);
+      if (validSizes.length > 0) {
+        const prices = validSizes.map(s => sizesMap[s]);
+        min = Math.min(min, ...prices);
+        max = Math.max(max, ...prices);
+      }
+    }
+  }
+
+  if (min === max) {
+    return `$${min.toLocaleString()}`;
+  }
+  return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
+}

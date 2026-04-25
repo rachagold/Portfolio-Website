@@ -4,7 +4,7 @@ import { AnimatedSection } from '../../components/AnimatedSection';
 import { COLLECTIONS, CollectionDef, CollectionTileDef } from '../../data/collections';
 import { products } from '../../data/products';
 import { useCart } from '../../components/CartProvider';
-import { getBasePrice } from '../../lib/pricing';
+import { getBasePrice, getPriceRange } from '../../lib/pricing';
 import { ChevronRight } from 'lucide-react';
 
 function OOSBadge({ small }: { small?: boolean }) {
@@ -28,7 +28,7 @@ function ProductTile({ label, tile }: TileProps) {
   const { region } = useCart();
   const product = products.find((p) => p.slug === tile.slug);
   const priceStr = product
-    ? `from $${getBasePrice(product, region).toFixed(2)}`
+    ? getPriceRange(product, region)
     : '';
 
   return (
@@ -82,6 +82,7 @@ export function CollectionPage() {
 
   const tiles: { label: string; tile: CollectionTileDef }[] = [
     { label: 'Prints', tile: col.tiles.prints },
+    { label: 'Postcards', tile: col.tiles.postcards },
     { label: 'Tees', tile: col.tiles.tees },
     { label: 'Totes', tile: col.tiles.totes },
     { label: 'Original', tile: col.tiles.original },
@@ -119,9 +120,9 @@ export function CollectionPage() {
         </div>
       </AnimatedSection>
 
-      {/* 4-tile product type grid */}
+      {/* 5-tile product type grid */}
       <AnimatedSection delay={0.1}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 md:gap-8">
           {tiles.map(({ label, tile }, i) => (
             <AnimatedSection key={label} delay={i * 0.07}>
               <ProductTile label={label} tile={tile} />

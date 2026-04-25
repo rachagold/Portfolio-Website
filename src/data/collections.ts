@@ -26,6 +26,7 @@ export interface CollectionDef {
   coverImage: string | null;
   tiles: {
     prints: CollectionTileDef;
+    postcards: CollectionTileDef;
     tees: CollectionTileDef;
     totes: CollectionTileDef;
     original: CollectionTileDef;
@@ -43,6 +44,10 @@ export const COLLECTIONS: CollectionDef[] = [
       prints: {
         thumbnail: asset('Russian Market', 'Russian Market - All.png'),
         slug: 'russian-market-prints',
+      },
+      postcards: {
+        thumbnail: asset('Russian Market', 'Russian Market - Post Card.png'),
+        slug: 'russian-market-postcards',
       },
       tees: {
         thumbnail: asset('Russian Market', 'Russian Market - Tee White.png'),
@@ -70,6 +75,10 @@ export const COLLECTIONS: CollectionDef[] = [
         thumbnail: asset('Phnom Aoral', 'Phnom Aoral - All.png'),
         slug: 'phnom-aoral-prints',
       },
+      postcards: {
+        thumbnail: asset('Phnom Aoral', 'Phnom Aoral - Postcard.png'),
+        slug: 'phnom-aoral-postcards',
+      },
       tees: {
         thumbnail: asset('Phnom Aoral', 'Phnom Aoral - Tee Black.png'),
         slug: 'phnom-aoral-tees',
@@ -96,6 +105,10 @@ export const COLLECTIONS: CollectionDef[] = [
         thumbnail: asset('Jeju', 'Jeju - All Prints.png'),
         slug: 'jeju-prints',
       },
+      postcards: {
+        thumbnail: asset('Jeju', 'Jeju - Post card.png'),
+        slug: 'jeju-postcards',
+      },
       tees: {
         thumbnail: asset('Jeju', 'Jeju - Tee White.png'),
         slug: 'jeju-tees',
@@ -121,6 +134,10 @@ export const COLLECTIONS: CollectionDef[] = [
       prints: {
         thumbnail: asset('Koh Rong EP', 'Koh Rong EP - All Prints.png'),
         slug: 'koh-rong-ep-prints',
+      },
+      postcards: {
+        thumbnail: asset('Koh Rong EP', 'Koh Rong EP - Postcard.png'),
+        slug: 'koh-rong-ep-postcards',
       },
       tees: {
         // note: exact filename uses lowercase 'w'
@@ -149,6 +166,10 @@ export const COLLECTIONS: CollectionDef[] = [
         thumbnail: asset('Phnom Aoral EP', 'Phnom Aoral EP - All prints.png'),
         slug: 'phnom-aoral-ep-prints',
       },
+      postcards: {
+        thumbnail: asset('Phnom Aoral EP', 'Phnom Aoral EP - Post Card.png'),
+        slug: 'phnom-aoral-ep-postcards',
+      },
       tees: {
         thumbnail: asset('Phnom Aoral EP', 'Phnom Aoral EP - Tee White.png'),
         slug: 'phnom-aoral-ep-tees',
@@ -172,11 +193,15 @@ export const COLLECTIONS: CollectionDef[] = [
     coverImage: asset('Independence', 'Independence - Post card.png'),
     tiles: {
       prints: {
-        thumbnail: asset('Independence', 'Independence - Post card.png'),
+        thumbnail: asset('Independence', 'Independence - A4.png'),
         slug: 'independence-prints',
       },
+      postcards: {
+        thumbnail: asset('Independence', 'Independence - Post card.png'),
+        slug: 'independence-postcards',
+      },
       tees: {
-        thumbnail: null, // still no tee assets
+        thumbnail: asset('Independence', 'Independence - Tee white.png'),
         slug: 'independence-tees',
       },
       totes: {
@@ -195,13 +220,17 @@ export const COLLECTIONS: CollectionDef[] = [
     name: 'Phnom Penh',
     displayName: 'Phnom Penh Collection',
     slug: 'phnom-penh',
-    coverImage: null, // folder is empty
+    coverImage: asset('Phnom Penh', 'Phnom Penh - Print 2.png'),
     tiles: {
-      prints: { thumbnail: null, slug: 'phnom-penh-prints' },
+      prints: { 
+        thumbnail: asset('Phnom Penh', 'Phnom Penh - Print 2.png'),
+        slug: 'phnom-penh-prints' 
+      },
+      postcards: { thumbnail: null, slug: 'phnom-penh-postcards' },
       tees: { thumbnail: null, slug: 'phnom-penh-tees' },
       totes: { thumbnail: null, slug: 'phnom-penh-totes' },
       original: {
-        thumbnail: null, // phnom_penh_2026.jpg not yet in filesystem
+        thumbnail: painting('cambodia', 'phnom_penh_2026.png'),
         slug: 'original-phnom-penh-2026',
       },
     },
