@@ -1,0 +1,4 @@
+/images/paintings
+/images/paintings/Mock Ups
+/images/paintings/No Watermarks/cambodia/daun_penh.jpg
+/images/products

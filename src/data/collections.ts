@@ -220,17 +220,26 @@ export const COLLECTIONS: CollectionDef[] = [
     name: 'Phnom Penh',
     displayName: 'Phnom Penh Collection',
     slug: 'phnom-penh',
-    coverImage: asset('Phnom Penh', 'Phnom Penh - Print 2.png'),
+    coverImage: asset('Phnom Penh', 'Phnom Penh - A4.png'),
     tiles: {
       prints: { 
-        thumbnail: asset('Phnom Penh', 'Phnom Penh - Print 2.png'),
+        thumbnail: asset('Phnom Penh', 'Phnom Penh - A4.png'),
         slug: 'phnom-penh-prints' 
       },
-      postcards: { thumbnail: null, slug: 'phnom-penh-postcards' },
-      tees: { thumbnail: null, slug: 'phnom-penh-tees' },
-      totes: { thumbnail: null, slug: 'phnom-penh-totes' },
+      postcards: { 
+        thumbnail: asset('Phnom Penh', 'Phnom Penh - Post card.png'), 
+        slug: 'phnom-penh-postcards' 
+      },
+      tees: { 
+        thumbnail: asset('Phnom Penh', 'Phnom Penh - Tee White.png'), 
+        slug: 'phnom-penh-tees' 
+      },
+      totes: { 
+        thumbnail: asset('Phnom Penh', 'Phnom Penh - Tote beige.png'), 
+        slug: 'phnom-penh-totes' 
+      },
       original: {
-        thumbnail: painting('cambodia', 'phnom_penh_2026.png'),
+        thumbnail: painting('cambodia', 'Phnom Penh.png').replace('.jpg', '.png'),
         slug: 'original-phnom-penh-2026',
       },
     },

@@ -97,8 +97,8 @@ export const paintings: Painting[] = [
     description: 'This piece reflects a space that exists just beyond crowded streets and a nightly spectacle. People gather nearby, but remains outside the frame. Human presence exists is only suggested as the energy comes from the familiar market symbols, layered textures, and the rhythm of the city itself.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    ...p('cambodia', 'battambang', { t: 'png' }), // Special case: only png in Watermarks, using it for both if thumb missing
-    status: 'Available'
+    ...p('cambodia', 'battambang', { t: 'png' }), 
+    status: 'Hidden'
   },
   {
     id: 'c8',
@@ -108,7 +108,7 @@ export const paintings: Painting[] = [
     description: 'This piece explores the coexistence of tradition and modern life through moments of visual and symbolic tension. The honor of a monk, yet absorbed by a phone; a traditional building against a modern skyscraper. The use of saffron orange, the color of a monk’s robe, symbolizing detachment from material desire, highlights how these values can feel at odds within a modern world.',
     collection: 'Cambodia',
     subCollection: 'Main Series',
-    ...p('cambodia', 'phnom_penh_2026', { t: 'png' }), // thumb not in filesystem yet, using png as fallback
+    ...p('cambodia', 'Phnom Penh', { t: 'png' }), 
     status: 'Available'
   },
 
@@ -183,7 +183,7 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     ...p('cambodia', 'independence_ep'),
-    status: 'Available'
+    status: 'Sold'
   },
   {
     id: 'ep6',
@@ -291,7 +291,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Panel',
     dimensions: '30x45cm',
     collection: 'Commissions',
-    ...p('commissions', 'odaesan', { f: 'jpg' }), // Special case: JPG in both
+    ...p('commissions', 'odaesan'), 
     status: 'Commissioned'
   },
   {
@@ -301,7 +301,7 @@ export const paintings: Painting[] = [
     medium: 'Acrylic on Canvas',
     dimensions: '90x60cm',
     collection: 'Commissions',
-    ...p('commissions', 'banchan', { f: 'jpg' }), // Special case: JPG in both
+    ...p('commissions', 'banchan'), 
     status: 'Commissioned'
   },
 

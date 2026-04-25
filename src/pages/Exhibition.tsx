@@ -56,8 +56,8 @@ export function Exhibition() {
               Sra'Art: Geo Graphic
             </h1>
             <div className="text-xl md:text-2xl text-[#2D1F1C]/80 mb-8 font-light">
-              <p className="mb-2 text-[#93312A] font-bold">Closing Ceremony: May 1, 2026</p>
-              <p className="mb-2">Final Day to view the collection: May 1, 2026</p>
+              <p className="mb-2 text-[#93312A] font-bold">Closing Ceremony: April 8, 2026</p>
+              <p className="mb-2">Final Day to view the collection: April 8, 2026</p>
               <p>Phnom Penh, Cambodia</p>
             </div>
           </AnimatedSection>
@@ -83,11 +83,11 @@ export function Exhibition() {
               <div className="space-y-6 mb-10">
                 <div>
                    <h3 className="font-bold text-[#2D1F1C] mb-1">Closing Ceremony:</h3>
-                   <p className="text-[#2D1F1C]/80">May 1, 2026</p>
+                   <p className="text-[#2D1F1C]/80">April 8, 2026</p>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#2D1F1C] mb-1">Absolute Last Day:</h3>
-                  <p className="text-[#2D1F1C]/80">May 1, 2026</p>
+                  <p className="text-[#2D1F1C]/80">April 8, 2026</p>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#2D1F1C] mb-1">Location:</h3>

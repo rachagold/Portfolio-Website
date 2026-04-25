@@ -75,8 +75,8 @@ export function Home() {
                 Closing Ceremony
               </span>
               <h2 className="text-3xl md:text-4xl font-serif mb-2">Sra'Art: Geo Graphic</h2>
-              <p className="text-white/80 text-sm mb-1">Final Day: May 1, 2026 | Phnom Penh, Cambodia</p>
-              <p className="text-white/70 text-sm max-w-md">Last chance to view the Geo Graphic collection before it closes forever on May 1.</p>
+              <p className="text-white/80 text-sm mb-1">Final Day: April 8, 2026 | Phnom Penh, Cambodia</p>
+              <p className="text-white/70 text-sm max-w-md">Last chance to view the Geo Graphic collection before it closes forever on April 8.</p>
             </div>
 
             <Link to="/exhibition" className="relative z-10 whitespace-nowrap bg-[#779C91] hover:bg-[#5E857A] text-white px-8 py-3 rounded-full transition-colors font-medium">
@@ -118,9 +118,6 @@ export function Home() {
                         className="w-full h-auto md:w-full md:h-[400px] object-contain bg-transparent block transition-transform duration-700 group-hover:scale-[1.03]"
                         referrerPolicy="no-referrer"
                       />
-                      {painting.status === 'Sold' && (
-                        <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">Sold</div>
-                      )}
                       {painting.subCollection === 'Excess Paint' && (
                         <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">EP</div>
                       )}
@@ -159,9 +156,6 @@ export function Home() {
               <div key={painting.id} className="group block cursor-pointer flex-1" onClick={() => openLightbox(painting)}>
                 <div className="overflow-hidden mb-4 bg-transparent shadow-sm relative rounded-xl flex items-center justify-center">
                   <img src={painting.image} alt={painting.title} className="w-full h-auto md:w-full md:h-[400px] object-contain bg-transparent block group-hover:scale-[1.03] transition-transform duration-700" referrerPolicy="no-referrer"/>
-                  {painting.status === 'Sold' && (
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-[#93312A] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">Sold</div>
-                  )}
                   {painting.subCollection === 'Excess Paint' && (
                     <div className="absolute top-3 right-3 px-3 py-1 bg-[#779C91] text-white text-xs font-mono uppercase tracking-wider rounded-full z-10">EP</div>
                   )}
