@@ -113,7 +113,7 @@ export function Cambodia() {
               <h1 className="text-5xl md:text-6xl font-serif text-[#2D1F1C] mb-4">Cambodia</h1>
               <p className="text-[#93312A] font-medium tracking-widest uppercase mb-8">2024 - Present</p>
               <p className="max-w-2xl mx-auto text-[#2D1F1C]/80 text-lg leading-relaxed">
-                This body of work captures the places and rhythms of life in Cambodia.
+                This body of work captures the places and moments that define life in Cambodia.
               </p>
             </div>
           )}

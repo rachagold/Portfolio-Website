@@ -27,7 +27,7 @@ export function Korea() {
         <h1 className="text-5xl md:text-6xl font-serif text-[#93312A] mb-4 uppercase tracking-wider">South Korea</h1>
         <p className="text-[#2D1F1C] font-medium tracking-widest mb-8">2022 - 2024</p>
         <p className="max-w-3xl mx-auto text-[#2D1F1C]/80 text-lg leading-relaxed">
-          Six paintings from two years living in South Korea. Joseon-era temples, volcanic islands, and mountain trails filtered through geometric abstraction.
+          This series highlights the harmony of opposites that I saw living in South Korea. I found inspiration in the traditional temples framed by soaring modern skyscrapers, and the seamless integration of human designs within the natural landscape.
         </p>
       </AnimatedSection>
 
