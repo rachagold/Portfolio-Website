@@ -22,7 +22,7 @@ const PRINT_PRICES: Record<string, number> = {
   'A3 (Poster)': 30,
   'A2 (Large Poster)': 45,
 };
-const TEE_SIZES = ['Medium', 'Large', 'X-Large', 'XX-Large'];
+const TEE_SIZES = ['Small', 'Medium', 'Large', 'X-Large', 'XX-Large'];
 const TOTE_SIZES = ['Standard', 'Large'];
 const TOTE_PRICES: Record<string, number> = { Standard: 20, Large: 30 };
 

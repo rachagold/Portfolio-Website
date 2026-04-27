@@ -171,7 +171,7 @@ export const paintings: Painting[] = [
     collection: 'Cambodia',
     subCollection: 'Excess Paint',
     ...p('cambodia', 'russian_market_ep'),
-    status: 'Available'
+    status: 'Sold'
   },
   {
     id: 'ep5',

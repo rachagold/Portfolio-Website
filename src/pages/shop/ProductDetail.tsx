@@ -407,6 +407,7 @@ export function ProductDetail() {
                 <div className="space-y-4">
                   {product.category === 'T-shirts' && (
                     <ul className="space-y-1">
+                      <li><span className="font-medium">Small:</span> Length 66 × Width 50 cm</li>
                       <li><span className="font-medium">Medium:</span> Length 71 × Width 53 cm</li>
                       <li><span className="font-medium">Large:</span> Length 73 × Width 55 cm</li>
                       <li><span className="font-medium">X-Large:</span> Length 74 × Width 57 cm</li>
