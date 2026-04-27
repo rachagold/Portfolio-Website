@@ -11,33 +11,41 @@ function slugify(input: string): string {
 }
 
 /**
- * Cambodia price source-of-truth: Docs spreadsheet (USD).
- * International price: +30%.
+ * Price source-of-truth: Docs spreadsheet (USD).
+ * 'int' = International (US and Canada)
+ * 'local' = Cambodia
  */
-const CAMBODIA_PRICE_USD_BY_TITLE: Record<string, number> = {
+const PRICE_MAP: Record<string, { int: number; local: number }> = {
   // Korea
-  'Nowon-Gu': 1200,
-  'Nami Island': 1200,
-  'Dobongsan': 1800,
-  'Jeju ii': 1200,
+  'Nowon-Gu': { int: 1200, local: 1200 },
+  'Nami Island': { int: 1200, local: 1200 },
+  'Dobongsan': { int: 1800, local: 1800 },
+  'Jeju ii': { int: 1200, local: 1200 }, // Matches 'Jeju 25' in CSV
+  'Jeju': { int: 8000, local: 8000 },    // Matches 'Jeju 24' in CSV
 
   // Cambodia
-  'Phnom Aoral': 4400,
-  'Phnom Aoral EP': 190,
-  'Russian Market 25': 1800,
-  'Russian Market 25 EP': 90,
-  'Daun Penh': 1400,
-  'Daun Penh EP': 1200,
-  'Independence Monument': 1400,
-  'Independence Monument EP': 190,
-  'Koh Rong': 1400,
-  'Koh Rong EP i': 210,
-  'Koh Rong EP ii': 190,
-  'Russian Market 26': 1500,
-  'Russian Market 26 EP': 190,
-  'Battambang': 1500,
-  'Battambang EP': 120,
-  'Phnom Penh 2026': 2800,
+  'Phnom Aoral': { int: 4400, local: 4400 },
+  'Phnom Aoral EP': { int: 190, local: 190 },
+  'Russian Market 25': { int: 1800, local: 1800 },
+  'Russian Market 25 EP': { int: 90, local: 90 },
+  'Daun Penh': { int: 1400, local: 1400 },
+  'Daun Penh EP': { int: 1200, local: 1200 },
+  'Independence Monument': { int: 1400, local: 1400 },
+  'Independence Monument EP': { int: 190, local: 190 },
+  'Koh Rong': { int: 1400, local: 1400 },
+  'Koh Rong EP i': { int: 210, local: 210 },
+  'Koh Rong EP ii': { int: 190, local: 190 },
+  'Russian Market 26': { int: 1500, local: 1500 },
+  'Russian Market 26 EP': { int: 190, local: 190 },
+  'Battambang': { int: 1500, local: 1500 },
+  'Battambang EP': { int: 120, local: 120 },
+  'Phnom Penh 2026': { int: 2800, local: 2800 },
+
+  // Other
+  'Rocky Mountains': { int: 190, local: 190 },
+  'Bangkok': { int: 420, local: 420 },
+  'Golden Ganesha': { int: 1200, local: 1200 },
+  'Myeongdong': { int: 420, local: 420 },
 };
 
 const MOCKUP_BASE = '/images/paintings/Mock Ups';
@@ -75,18 +83,17 @@ function toProductCollection(
   return 'Other';
 }
 
-function getCambodiaPriceUSD(title: string): number | null {
-  const price = CAMBODIA_PRICE_USD_BY_TITLE[title];
-  return typeof price === 'number' ? price : null;
+function getPrices(title: string): { int: number; local: number } | null {
+  return PRICE_MAP[title] || null;
 }
 
 export const originalArtworks: Product[] = paintings
   .filter((p) => p.status === 'Available')
   .map((p): Product | null => {
-    const cambodiaPrice = getCambodiaPriceUSD(p.title);
-    if (cambodiaPrice == null) return null;
+    const priceData = getPrices(p.title);
+    if (priceData == null) return null;
 
-    const internationalPrice = Number((cambodiaPrice * 1.3).toFixed(2));
+    const { int: internationalPrice, local: cambodiaPrice } = priceData;
     const dimensions = p.dimensions ? ` • ${p.dimensions}` : '';
     const description =
       p.description ??

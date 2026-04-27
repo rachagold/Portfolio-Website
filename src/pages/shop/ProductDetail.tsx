@@ -47,7 +47,6 @@ export function ProductDetail() {
   const [activeTab, setActiveTab] = useState<'Sizing' | 'Shipping'>('Sizing');
   const [displayPrice, setDisplayPrice] = useState(product?.price || 0);
 
-  const ignoreSelectionEffects = React.useRef(false);
 
   const findVersion2 = (baseImg: string) => {
     if (!product) return baseImg;
@@ -68,9 +67,7 @@ export function ProductDetail() {
     }
   }, [selectedSize, product, region]);
 
-  // Handle dropdown selection for Size
   const handleSizeChange = (size: string) => {
-    if (ignoreSelectionEffects.current) return;
     setSelectedSize(size);
     if (product?.sizeImages && product.sizeImages[size]) {
       const standardImg = product.sizeImages[size];
@@ -80,9 +77,7 @@ export function ProductDetail() {
     }
   };
 
-  // Handle dropdown selection for Color
   const handleColorChange = (color: string) => {
-    if (ignoreSelectionEffects.current) return;
     setSelectedColor(color);
     if (product?.colorImages && product.colorImages[color]) {
       const standardImg = product.colorImages[color];
@@ -221,29 +216,7 @@ export function ProductDetail() {
                   {product.images.map((img, i) => (
                     <button
                       key={i}
-                      onClick={() => {
-                        ignoreSelectionEffects.current = true;
-                        setActiveImage(i);
-
-                        // Helper to strip " 2" before extension for matching
-                        const normalize = (path: string) => path.replace(/ [2]\.(png|jpg|webp|jpeg)$/i, '.$1').toLowerCase();
-                        const targetNorm = normalize(img);
-
-                        // sync selection indicators WITHOUT triggering image jump
-                        if (product.sizeImages) {
-                          const match = Object.entries(product.sizeImages).find(([, v]) => normalize(v) === targetNorm);
-                          if (match) setSelectedSize(match[0]);
-                        }
-                        if (product.colorImages) {
-                          const match = Object.entries(product.colorImages).find(([, v]) => normalize(v) === targetNorm);
-                          if (match) setSelectedColor(match[0]);
-                        }
-                        
-                        // Release override after React updates
-                        setTimeout(() => {
-                          ignoreSelectionEffects.current = false;
-                        }, 50);
-                      }}
+                      onClick={() => setActiveImage(i)}
                       className={`w-20 h-20 flex-shrink-0 bg-transparent rounded-xl p-1.5 border-2 transition-all duration-300 snap-start ${
                         safeActiveImage === i
                           ? 'border-[#93312A] scale-105'

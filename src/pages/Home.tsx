@@ -177,7 +177,7 @@ export function Home() {
 
         <AnimatedSection>
           <h2 className="text-4xl font-serif text-[#2D1F1C] mb-4">Prints &amp; Wearables</h2>
-          <p className="text-[#2D1F1C]/70 mb-12 max-w-xl">Prints, tees, and tote bags featuring original artwork. Each piece carries the same geometric spirit as the paintings.</p>
+          <p className="text-[#2D1F1C]/70 mb-12 max-w-xl">Prints, tees, and tote bags featuring original artwork.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[

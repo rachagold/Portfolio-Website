@@ -11,7 +11,7 @@ const CAMBODIA_BASE: Record<string, number> = {
 
 const CAMBODIA_SIZE: Record<string, Record<string, number>> = {
   'Totes': { 'Standard': 15, 'Large': 20 },
-  'Prints': { 'A6 (Post card)': 3, 'A4': 12, 'A3 (Poster)': 20 },
+  'Prints': { 'A6 (Post card)': 3, 'A4': 12, 'A3 (Poster)': 20, 'A2 (Large Poster)': 30 },
 };
 
 /** Resolve the display price for a product + region + optional size. */

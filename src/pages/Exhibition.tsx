@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Facebook } from 'lucide-react';
 import { AnimatedSection } from '../components/AnimatedSection';
 import { paintings } from '../data/paintings';
 import { Lightbox } from '../components/Lightbox';
@@ -96,9 +97,15 @@ export function Exhibition() {
               </div>
 
               <div className="space-y-4">
-                <p className="text-[#2D1F1C]/60 text-center py-4 italic border-t border-[#93312A]/10">
-                  Facebook event coming soon.
-                </p>
+                <a 
+                  href="https://www.facebook.com/share/18hZK6ED4W/?mibextid=wwXIfr" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center justify-center gap-2 w-full text-center bg-[#93312A] text-white hover:opacity-90 px-8 py-4 rounded-full font-medium transition-all"
+                >
+                  <Facebook className="w-5 h-5" />
+                  View Facebook Event
+                </a>
                 <Link to="/portfolio/cambodia" className="block w-full text-center bg-transparent border-2 border-[#93312A] text-[#93312A] hover:bg-[#93312A] hover:text-white px-8 py-4 rounded-full font-medium transition-colors">
                   See the Collection
                 </Link>
