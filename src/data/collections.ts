@@ -190,10 +190,10 @@ export const COLLECTIONS: CollectionDef[] = [
     name: 'Independence',
     displayName: 'Independence Collection',
     slug: 'independence',
-    coverImage: asset('Independence', 'Independence - Post card.png'),
+    coverImage: asset('Independence', 'Independence - All.png'),
     tiles: {
       prints: {
-        thumbnail: asset('Independence', 'Independence - A4.png'),
+        thumbnail: asset('Independence', 'Independence - All.png'),
         slug: 'independence-prints',
       },
       postcards: {

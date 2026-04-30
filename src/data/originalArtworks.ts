@@ -73,6 +73,9 @@ const MOCKUP_CONFIG: Record<string, string> = {
   'Nami Island': 'Nami Island -',
   'Dobongsan': 'Dobangsan-',
   'Battambang EP': 'Battambang EP -',
+  'Myeongdong': 'Myeongdong -',
+  'Golden Ganesha': 'Golden Ganesha -',
+  'Rocky Mountains': 'Rocky Mountain -',
 };
 
 function toProductCollection(

@@ -55,7 +55,7 @@ export function ProductDetail() {
     const pathWithoutExt = baseImg.substring(0, dotIdx);
     const ext = baseImg.substring(dotIdx);
     const altPath = `${pathWithoutExt} 2${ext}`;
-    
+
     const foundAlt = product.images.find(img => img.toLowerCase() === altPath.toLowerCase());
     return foundAlt || baseImg;
   };
@@ -93,20 +93,20 @@ export function ProductDetail() {
       setSelectedColor('');
       setSelectedSize('');
       setQuantity(1);
-      
+
       // Default to " 2" alternate view if it exists
       // EXCEPT for Prints if they have an "All" overview at index 0
-      const isPrintOverview = product.category === 'Prints' && 
-        (product.images[0]?.toLowerCase().includes('all prints') || 
-         product.images[0]?.toLowerCase().includes('all posters') ||
-         product.images[0]?.toLowerCase().includes(' - all.png') ||
-         product.images[0]?.toLowerCase().includes(' - all.jpg'));
+      const isPrintOverview = product.category === 'Prints' &&
+        (product.images[0]?.toLowerCase().includes('all prints') ||
+          product.images[0]?.toLowerCase().includes('all posters') ||
+          product.images[0]?.toLowerCase().includes(' - all.png') ||
+          product.images[0]?.toLowerCase().includes(' - all.jpg'));
 
       if (isPrintOverview) {
         setActiveImage(0);
       } else {
-        const altIdx = product.images.findIndex(img => 
-          img.toLowerCase().includes(' 2.png') || 
+        const altIdx = product.images.findIndex(img =>
+          img.toLowerCase().includes(' 2.png') ||
           img.toLowerCase().includes(' 2.jpg') ||
           img.toLowerCase().includes(' 2.webp')
         );
@@ -133,42 +133,64 @@ export function ProductDetail() {
     addToCart(product, quantity, selectedColor, selectedSize, displayPrice);
   };
 
-  const sameCategoryProducts = products.filter(p => p.id !== product.id && p.category === product.category);
-  
-  let sameArtworkProducts: typeof products = [];
+  // --- Related Products Logic ---
+  // Left Side: Same Category (Fuzzy series match for Originals)
+  let leftItems: typeof products = [];
+  if (product.category === 'Originals') {
+    const allOriginals = products.filter(p => p.category === 'Originals' && p.id !== product.id);
+    const getSeriesBase = (name: string) => {
+      const series = [
+        'Russian Market', 'Phnom Aoral', 'Jeju', 'Koh Rong', 'Independence', 
+        'Phnom Penh', 'Battambang', 'Nowon-Gu', 'Nami Island', 'Dobongsan',
+        'Myeongdong', 'Bangkok', 'Golden Ganesha', 'Rocky Mountains'
+      ];
+      for (const s of series) if (name.includes(s)) return s;
+      return name.split(' ').slice(0, 2).join(' ');
+    };
+    const currentSeries = getSeriesBase(product.name);
+    const matchingOriginals = allOriginals.filter(p => p.name.includes(currentSeries));
+    
+    if (matchingOriginals.length >= 2) {
+      leftItems = [...matchingOriginals].sort(() => 0.5 - Math.random()).slice(0, 2);
+    } else {
+      const remaining = allOriginals.filter(p => !matchingOriginals.find(m => m.id === p.id));
+      leftItems = [...matchingOriginals, ...remaining.sort(() => 0.5 - Math.random())].slice(0, 2);
+    }
+  } else {
+    leftItems = products.filter(p => p.id !== product.id && p.category === product.category).slice(0, 2);
+  }
+
+  // Right Side: Same Artwork / Collection
+  let rightItems: typeof products = [];
   if (collectionCrumb) {
-    const currentCollection = COLLECTIONS.find(c => c.slug === collectionCrumb.href.split('/').pop());
+    const collectionSlug = collectionCrumb.href.split('/').pop();
+    const currentCollection = COLLECTIONS.find(c => c.slug === collectionSlug);
     if (currentCollection) {
       const artworkSlugs = [
         currentCollection.tiles.prints.slug,
         currentCollection.tiles.tees.slug,
         currentCollection.tiles.totes.slug,
+        currentCollection.tiles.postcards?.slug,
         currentCollection.tiles.original.slug
-      ];
-      sameArtworkProducts = products.filter(p => p.id !== product.id && artworkSlugs.includes(p.slug));
+      ].filter(Boolean) as string[];
+
+      rightItems = products.filter(p => 
+        p.id !== product.id && 
+        artworkSlugs.includes(p.slug) &&
+        !leftItems.find(li => li.id === p.id)
+      ).slice(0, 2);
     }
   }
 
-  const leftItems = sameCategoryProducts.slice(0, 2);
-  const rightItems = sameArtworkProducts.filter(p => !leftItems.find(l => l.id === p.id)).slice(0, 2);
-
-  const bestSellersFallback = products.filter(p => 
-    p.id !== product.id && 
-    !leftItems.find(l => l.id === p.id) && 
-    !rightItems.find(r => r.id === p.id)
-  );
-
-  const finalLeft = [...leftItems];
-  const finalRight = [...rightItems];
-
-  while (finalLeft.length < 2 && bestSellersFallback.length > 0) {
-    finalLeft.push(bestSellersFallback.shift()!);
+  // Final Combine & Fallback
+  const finalRelated = [...leftItems, ...rightItems];
+  if (finalRelated.length < 4) {
+    const fallback = products.filter(p => 
+      p.id !== product.id && 
+      !finalRelated.find(r => r.id === p.id)
+    );
+    finalRelated.push(...fallback.slice(0, 4 - finalRelated.length));
   }
-  while (finalRight.length < 2 && bestSellersFallback.length > 0) {
-    finalRight.push(bestSellersFallback.shift()!);
-  }
-
-  const relatedProducts = [...finalLeft, ...finalRight];
 
   const increaseQuantity = () => setQuantity((prev) => prev + 1);
   const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -217,11 +239,10 @@ export function ProductDetail() {
                     <button
                       key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`w-20 h-20 flex-shrink-0 bg-transparent rounded-xl p-1.5 border-2 transition-all duration-300 snap-start ${
-                        safeActiveImage === i
+                      className={`w-20 h-20 flex-shrink-0 bg-transparent rounded-xl p-1.5 border-2 transition-all duration-300 snap-start ${safeActiveImage === i
                           ? 'border-[#93312A] scale-105'
                           : 'border-transparent hover:border-[#93312A]/30 hover:scale-105'
-                      }`}
+                        }`}
                     >
                       <img
                         src={img}
@@ -285,9 +306,8 @@ export function ProductDetail() {
                 <select
                   value={selectedSize}
                   onChange={(e) => handleSizeChange(e.target.value)}
-                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${
-                    !selectedSize ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'
-                  }`}
+                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${!selectedSize ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'
+                    }`}
                 >
                   <option value="" disabled>Select a size...</option>
                   {product.sizes.map((size) => (
@@ -307,9 +327,8 @@ export function ProductDetail() {
                 <select
                   value={selectedColor}
                   onChange={(e) => handleColorChange(e.target.value)}
-                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${
-                    !selectedColor ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'
-                  }`}
+                  className={`w-full appearance-none bg-transparent border border-[#93312A] rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-[#93312A]/50 ${!selectedColor ? 'text-[#2D1F1C]/50' : 'text-[#2D1F1C]'
+                    }`}
                 >
                   <option value="" disabled>Select a color...</option>
                   {product.colors.map((color) => (
@@ -366,17 +385,16 @@ export function ProductDetail() {
                   <button
                     onClick={handleAddToCart}
                     disabled={disabled}
-                    className={`flex-1 py-4 rounded-full text-lg font-medium transition-colors ${
-                      disabled
+                    className={`flex-1 py-4 rounded-full text-lg font-medium transition-colors ${disabled
                         ? 'bg-[#779C91]/50 cursor-not-allowed text-white/70'
                         : 'bg-[#779C91] hover:bg-[#5E857A] text-white'
-                    }`}
+                      }`}
                   >
                     {!product.inStock
                       ? 'Out of Stock'
                       : noOptionsSelected
-                      ? 'Select Options'
-                      : 'Add to Cart'}
+                        ? 'Select Options'
+                        : 'Add to Cart'}
                   </button>
                 );
               })()}
@@ -390,9 +408,8 @@ export function ProductDetail() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-4 font-medium transition-colors relative ${
-                    activeTab === tab ? 'text-[#93312A]' : 'text-[#2D1F1C]/60 hover:text-[#2D1F1C]'
-                  }`}
+                  className={`py-4 font-medium transition-colors relative ${activeTab === tab ? 'text-[#93312A]' : 'text-[#2D1F1C]/60 hover:text-[#2D1F1C]'
+                    }`}
                 >
                   {tab}
                   {activeTab === tab && (
@@ -458,7 +475,7 @@ export function ProductDetail() {
       </div>
 
       {/* Related products */}
-      {relatedProducts.length > 0 && (
+      {finalRelated.length > 0 && (
         <AnimatedSection>
           <div className="mb-8">
             <h2 className="text-3xl font-serif text-[#93312A] text-center mb-10">
@@ -466,9 +483,15 @@ export function ProductDetail() {
             </h2>
             <div className="grid grid-cols-2 gap-8 text-xs sm:text-sm font-medium uppercase tracking-widest text-[#2D1F1C]/70 border-b border-[#93312A]/10 pb-4">
               <div className="text-center">
-                <Link to={`/shop/category/${product.category.toLowerCase()}`} className="hover:text-[#93312A] transition-colors">
-                  See All {product.category}
-                </Link>
+                {product.category === 'Originals' ? (
+                  <Link to="/shop/originals" className="hover:text-[#93312A] transition-colors">
+                    See All Originals
+                  </Link>
+                ) : (
+                  <Link to={`/shop/category/${product.category.toLowerCase()}`} className="hover:text-[#93312A] transition-colors">
+                    See All {product.category}
+                  </Link>
+                )}
               </div>
               <div className="text-center">
                 {collectionCrumb && (
@@ -480,7 +503,7 @@ export function ProductDetail() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {relatedProducts.map((rp) => (
+            {finalRelated.map((rp) => (
               <Link key={rp.id} to={`/shop/${rp.slug}`} className="group text-center">
                 <div className="aspect-square rounded-2xl overflow-hidden mb-4 bg-transparent transition-all duration-300">
                   {rp.image ? (

@@ -476,8 +476,9 @@ export const collectionProducts: Product[] = [
     price: 18,
     category: 'Prints',
     collection: 'Cambodia',
-    image: p('Independence', 'Independence - A4.png'),
+    image: p('Independence', 'Independence - All.png'),
     images: [
+      p('Independence', 'Independence - All.png'),
       p('Independence', 'Independence - A4.png'),
       p('Independence', 'Independence - A3.png'),
       p('Independence', 'Independence - A2.png'),
