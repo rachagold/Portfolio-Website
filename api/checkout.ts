@@ -42,7 +42,7 @@ export default async function handler(req: any, res: any) {
                 const img = item.image.startsWith('http')
                     ? item.image
                     : `${baseUrl}${item.image.startsWith('/') ? '' : '/'}${item.image}`;
-                imageUrls.push(img);
+                imageUrls.push(encodeURI(img));
             }
 
             return {
