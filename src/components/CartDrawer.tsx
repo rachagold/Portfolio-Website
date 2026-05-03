@@ -27,7 +27,7 @@ export function CartDrawer() {
             name: item.product.name,
             price: item.unitPrice || item.product.price,
             quantity: item.quantity,
-            image: item.product.image
+            image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '')
           })),
           region: region
         }),
@@ -76,7 +76,7 @@ export function CartDrawer() {
             <div className="space-y-6">
               {items.map((item, index) => (
                 <div key={`${item.product.id}-${index}`} className="flex gap-4 items-start">
-                  <img src={item.product.image} alt={item.product.name} className="w-20 h-20 object-contain bg-transparent rounded-md shadow-sm" referrerPolicy="no-referrer" />
+                  <img src={item.product.image || item.product.images?.[0] || ''} alt={item.product.name} className="w-20 h-20 object-contain bg-transparent rounded-md shadow-sm" referrerPolicy="no-referrer" />
                   <div className="flex-1">
                     <h3 className="font-medium text-[#2D1F1C]">{item.product.name}</h3>
                     <p className="text-sm text-[#2D1F1C]/70">
@@ -199,7 +199,7 @@ export function CartDrawer() {
                       <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-48 h-48 sm:w-64 sm:h-64 rounded-md object-contain" />
                     </div>
                     <p className="text-sm text-[#2D1F1C]">Open your ABA app and scan the QR code above to complete your payment.</p>
-                    <button onClick={() => setCambodiaStep('success')} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg mt-4">
+                    <button onClick={() => { setIsCartOpen(false); window.location.href = '/success'; }} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg mt-4">
                       I have completed payment
                     </button>
                     <button onClick={() => setCambodiaStep('payment')} className="w-full text-sm text-[#2D1F1C]/60 transition-colors mt-2">Back to Payment Options</button>
