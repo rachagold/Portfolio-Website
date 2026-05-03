@@ -9,6 +9,7 @@ export function CartDrawer() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [hasAcknowledgedDelivery, setHasAcknowledgedDelivery] = useState(false);
   
   // --- CAMBODIA STATE ---
   const [cambodiaStep, setCambodiaStep] = useState<'contact' | 'payment' | 'aba_scan' | 'success'>('contact');
@@ -106,7 +107,10 @@ export function CartDrawer() {
 
             {!showCheckout ? (
               <button
-                onClick={() => setShowCheckout(true)}
+                onClick={() => {
+                  setShowCheckout(true);
+                  setHasAcknowledgedDelivery(false);
+                }}
                 className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg"
               >
                 Checkout
@@ -114,9 +118,26 @@ export function CartDrawer() {
             ) : (region === 'International' || region === 'Canada') ? (
               /* STRIPE BRANCH */
               <div className="space-y-4">
+                {!hasAcknowledgedDelivery && (
+                  <div className="bg-[#93312A]/10 p-4 rounded-lg border border-[#93312A]/20">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        required
+                        className="mt-1 accent-[#93312A] w-5 h-5 shrink-0"
+                        checked={hasAcknowledgedDelivery}
+                        onChange={(e) => setHasAcknowledgedDelivery(e.target.checked)}
+                      />
+                      <span className="text-sm text-[#2D1F1C]">
+                        I acknowledge that I will not receive my order until July of 2026.
+                      </span>
+                    </label>
+                  </div>
+                )}
                 <button
                   onClick={handleCheckout}
-                  className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg"
+                  disabled={!hasAcknowledgedDelivery}
+                  className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full font-medium transition-colors text-lg"
                 >
                   Pay with Card ({region === 'Canada' ? 'CAD' : 'USD'})
                 </button>
