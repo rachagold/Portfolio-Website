@@ -28,6 +28,7 @@ export function CartDrawer() {
             name: item.product.name,
             price: item.unitPrice || item.product.price,
             quantity: item.quantity,
+            category: item.product.category,
             image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '')
           })),
           region: region
@@ -161,7 +162,7 @@ export function CartDrawer() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                           ...cambodiaDetails,
-                          items: items.map(item => ({ name: item.product.name, quantity: item.quantity, price: item.unitPrice || item.product.price, size: item.selectedSize, color: item.selectedColor })),
+                          items: items.map(item => ({ name: item.product.name, quantity: item.quantity, price: item.unitPrice || item.product.price, size: item.selectedSize, color: item.selectedColor, category: item.product.category })),
                           cartTotal
                         }),
                       });

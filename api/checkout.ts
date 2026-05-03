@@ -58,13 +58,27 @@ export default async function handler(req: any, res: any) {
             };
         });
 
+        // Calculate discountable subtotal (exclude Original Paintings)
+        const discountableSubtotal = items
+            .filter((item: any) => item.category !== 'Originals')
+            .reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+
         // Create the Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items,
             mode: 'payment',
+            allow_promotion_codes: true,
+            metadata: {
+                discountable_subtotal: discountableSubtotal.toString(),
+            },
             success_url: `${baseUrl}/success`,
             cancel_url: `${baseUrl}/`,
+            custom_text: {
+                submit: {
+                    message: "Discounts apply to merchandise only and exclude original artworks."
+                }
+            },
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA'],
             },
