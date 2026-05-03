@@ -1,36 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../components/CartProvider';
 import { AnimatedSection } from '../components/AnimatedSection';
-import { ArrowRight, Instagram, Mail } from 'lucide-react';
+import { ArrowRight, Instagram, Mail, Loader2 } from 'lucide-react';
 import { CartItem } from '../lib/types';
 
 export function Success() {
-  const { items, region, clearCart } = useCart();
+  const { clearCart } = useCart();
   const [orderSummary, setOrderSummary] = useState<CartItem[]>([]);
   const [orderRegion, setOrderRegion] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // On mount, if cart has items, copy them to state and session storage, then clear the cart
-    if (items.length > 0) {
-      setOrderSummary(items);
-      setOrderRegion(region);
-      sessionStorage.setItem('rg_last_order', JSON.stringify({ items, region }));
-      clearCart();
-    } else {
-      // If refreshed, try to load from session storage
-      const saved = sessionStorage.getItem('rg_last_order');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setOrderSummary(parsed.items);
-          setOrderRegion(parsed.region);
-        } catch (e) {
-          console.error(e);
-        }
+    const verifySession = async () => {
+      const sessionId = searchParams.get('session_id');
+      const token = searchParams.get('token');
+      const regionParam = searchParams.get('region');
+
+      if (!sessionId && !token) {
+        navigate('/shop');
+        return;
       }
-    }
-  }, [items, region, clearCart]);
+
+      try {
+        const query = sessionId 
+          ? `session_id=${sessionId}&region=${regionParam || ''}`
+          : `token=${encodeURIComponent(token!)}`;
+          
+        const res = await fetch(`/api/verify-session?${query}`);
+        if (!res.ok) {
+          throw new Error('Verification failed');
+        }
+
+        const data = await res.json();
+        setOrderSummary(data.items);
+        setOrderRegion(data.region);
+        clearCart();
+        setLoading(false);
+      } catch (err) {
+        console.error('Session verification error:', err);
+        navigate('/shop');
+      }
+    };
+
+    verifySession();
+  }, [searchParams, navigate, clearCart]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[80vh] bg-[#E5DCCD] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#93312A] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[80vh] bg-[#E5DCCD] flex flex-col items-center justify-center py-20 px-6">

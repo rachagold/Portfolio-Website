@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import crypto from 'crypto';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const PRIMARY_EMAIL = 'jared@ottermaticsystems.com';
@@ -17,10 +18,10 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 
-  const { name, phone, contactMethod, deliveryLocation, items, cartTotal } = req.body;
+  const { name, email, phone, contactMethod, deliveryLocation, items, cartTotal } = req.body;
 
-  if (!name || !phone || !deliveryLocation) {
-    return res.status(400).json({ success: false, message: 'Name, phone, and delivery location are required.' });
+  if (!name || !phone || !deliveryLocation || !email) {
+    return res.status(400).json({ success: false, message: 'Name, email, phone, and delivery location are required.' });
   }
 
   const itemRows = items && items.length > 0
@@ -44,6 +45,7 @@ export default async function handler(req: any, res: any) {
     html: `
       <h2>New Cambodia Order Request</h2>
       <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
       <p><strong>Phone (${contactMethod || 'whatsapp'}):</strong> ${phone}</p>
       <p><strong>Delivery Location:</strong> ${deliveryLocation}</p>
       <hr>
@@ -74,7 +76,14 @@ export default async function handler(req: any, res: any) {
       resend.emails.send({ ...emailPayload, to: cc }).catch(() => {});
     }
 
-    return res.json({ success: true, message: 'Order details recorded. Ready for payment.' });
+    const payloadData = { items, email, region: 'Cambodia', timestamp: Date.now() };
+    const payload = JSON.stringify(payloadData);
+    const hmac = crypto.createHmac('sha256', process.env.STRIPE_SECRET_KEY || 'default_secret');
+    hmac.update(payload);
+    const signature = hmac.digest('hex');
+    const token = Buffer.from(JSON.stringify({ payload, signature })).toString('base64');
+
+    return res.json({ success: true, message: 'Order details recorded. Ready for payment.', token });
   } catch (error) {
     console.error('Failed to send cambodia order email:', error);
     return res.status(500).json({ success: false, message: 'Something went wrong. Please try again.' });

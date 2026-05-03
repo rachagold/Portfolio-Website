@@ -50,6 +50,7 @@ export default async function handler(req: any, res: any) {
                     currency: currency,
                     product_data: {
                         name: item.name,
+                        description: [item.selectedSize && `Size: ${item.selectedSize}`, item.selectedColor && `Color: ${item.selectedColor}`].filter(Boolean).join(' | ') || undefined,
                         images: imageUrls,
                     },
                     unit_amount: Math.round((item.price || 0) * 100),
@@ -71,8 +72,9 @@ export default async function handler(req: any, res: any) {
             allow_promotion_codes: true,
             metadata: {
                 discountable_subtotal: discountableSubtotal.toString(),
+                region: region || 'International',
             },
-            success_url: `${baseUrl}/success`,
+            success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&region=${region}`,
             cancel_url: `${baseUrl}/`,
             custom_text: {
                 submit: {

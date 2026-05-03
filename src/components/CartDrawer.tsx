@@ -13,8 +13,9 @@ export function CartDrawer() {
   
   // --- CAMBODIA STATE ---
   const [cambodiaStep, setCambodiaStep] = useState<'contact' | 'payment' | 'aba_scan' | 'success'>('contact');
-  const [cambodiaDetails, setCambodiaDetails] = useState({ name: '', phone: '', deliveryLocation: '', contactMethod: 'whatsapp' });
+  const [cambodiaDetails, setCambodiaDetails] = useState({ name: '', email: '', phone: '', deliveryLocation: '', contactMethod: 'whatsapp' });
   const [isSubmittingCambodia, setIsSubmittingCambodia] = useState(false);
+  const [cambodiaToken, setCambodiaToken] = useState<string | null>(null);
   const hasOriginals = items.some((i) => i.product.category === 'Originals');
 
   // --- STRIPE LOGIC START ---
@@ -29,6 +30,8 @@ export function CartDrawer() {
             price: item.unitPrice || item.product.price,
             quantity: item.quantity,
             category: item.product.category,
+            selectedSize: item.selectedSize,
+            selectedColor: item.selectedColor,
             image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '')
           })),
           region: region
@@ -162,12 +165,17 @@ export function CartDrawer() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                           ...cambodiaDetails,
-                          items: items.map(item => ({ name: item.product.name, quantity: item.quantity, price: item.unitPrice || item.product.price, size: item.selectedSize, color: item.selectedColor, category: item.product.category })),
+                          items: items.map(item => ({ name: item.product.name, quantity: item.quantity, price: item.unitPrice || item.product.price, size: item.selectedSize, color: item.selectedColor, category: item.product.category, image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '') })),
                           cartTotal
                         }),
                       });
-                      if (res.ok) setCambodiaStep('payment');
-                      else alert('Failed to save details. Please try again.');
+                      const data = await res.json();
+                      if (res.ok) {
+                        setCambodiaToken(data.token);
+                        setCambodiaStep('payment');
+                      } else {
+                        alert(data.message || 'Failed to save details. Please try again.');
+                      }
                     } catch {
                       alert('An error occurred. Please try again.');
                     } finally {
@@ -176,6 +184,7 @@ export function CartDrawer() {
                   }} className="space-y-4">
                     <h3 className="text-xl font-serif text-[#93312A]">Delivery Details</h3>
                     <input type="text" required placeholder="Full Name" value={cambodiaDetails.name} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, name: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
+                    <input type="email" required placeholder="Email Address" value={cambodiaDetails.email} onChange={(e) => setCambodiaDetails(prev => ({ ...prev, email: e.target.value }))} className="w-full bg-transparent border border-[#93312A]/30 rounded-lg px-4 py-3" />
                     <div>
                       <p className="text-sm text-[#2D1F1C]/70 mb-2 px-1">Preferred Contact Method:</p>
                       <div className="flex gap-4 px-1 mb-3">
@@ -221,7 +230,7 @@ export function CartDrawer() {
                       <img src="/images/cambodia-qr-code.png" alt="KHQR" className="w-48 h-48 sm:w-64 sm:h-64 rounded-md object-contain" />
                     </div>
                     <p className="text-sm text-[#2D1F1C]">Open your ABA app and scan the QR code above to complete your payment.</p>
-                    <button onClick={() => { setIsCartOpen(false); window.location.href = '/success'; }} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg mt-4">
+                    <button onClick={() => { setIsCartOpen(false); window.location.href = `/success?token=${cambodiaToken}`; }} className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] text-white rounded-full font-medium transition-colors text-lg mt-4">
                       I have completed payment
                     </button>
                     <button onClick={() => setCambodiaStep('payment')} className="w-full text-sm text-[#2D1F1C]/60 transition-colors mt-2">Back to Payment Options</button>
