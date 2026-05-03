@@ -65,6 +65,29 @@ export default async function handler(req: any, res: any) {
             mode: 'payment',
             success_url: `${baseUrl}/success`,
             cancel_url: `${baseUrl}/`,
+            shipping_address_collection: {
+                allowed_countries: ['US', 'CA'],
+            },
+            phone_number_collection: {
+                enabled: true,
+            },
+            custom_fields: [
+                {
+                    key: 'contact_method',
+                    label: {
+                        type: 'custom',
+                        custom: 'Preferred Contact Method',
+                    },
+                    type: 'dropdown',
+                    dropdown: {
+                        options: [
+                            { label: 'WhatsApp', value: 'whatsapp' },
+                            { label: 'Telegram', value: 'telegram' },
+                            { label: 'iMessage', value: 'imessage' },
+                        ],
+                    },
+                }
+            ],
         });
 
         // Send the URL back (CartDrawer will handle redirect)
