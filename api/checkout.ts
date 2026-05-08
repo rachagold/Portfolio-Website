@@ -88,10 +88,6 @@ export default async function handler(req: any, res: any) {
                     type: 'fixed_amount',
                     fixed_amount: { amount: deliveryFee * 100, currency: currency },
                     display_name: 'Delivery',
-                    delivery_estimate: {
-                      minimum: { unit: 'business_day', value: 3 },
-                      maximum: { unit: 'business_day', value: 7 },
-                    }
                 },
             });
             shipping_options.push({
@@ -111,6 +107,7 @@ export default async function handler(req: any, res: any) {
         // Create the Stripe Checkout Session
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
+            locale: 'en',
             line_items,
             mode: 'payment',
             allow_promotion_codes: true,
