@@ -12,9 +12,15 @@ export const config = {
   },
 };
 
-async function getRawBody(readable: any): Promise<Buffer> {
+const PRIMARY_EMAIL = 'jared@ottermaticsystems.com';
+const CC_EMAILS = ['rachagold.art@gmail.com'];
+
+async function getRawBody(req: any): Promise<Buffer> {
+  if (Buffer.isBuffer(req.body)) {
+    return req.body;
+  }
   const chunks = [];
-  for await (const chunk of readable) {
+  for await (const chunk of req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
   }
   return Buffer.concat(chunks);
@@ -57,67 +63,90 @@ export default async function handler(req: any, res: any) {
       const customerEmail = expandedSession.customer_details?.email;
       const customerName = expandedSession.customer_details?.name || 'Valued Customer';
       
+      // 2. Format items for the email
+      const items = expandedSession.line_items?.data.map((li: any) => {
+        const product = li.price?.product || {};
+        
+        // Parse size/color from description if available
+        let size;
+        let color;
+        if (product.description) {
+            const parts = product.description.split(' | ');
+            parts.forEach((p: string) => {
+                if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
+                if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
+            });
+        }
+
+        return {
+          name: product.name,
+          quantity: li.quantity || 1,
+          price: (li.price?.unit_amount || 0) / 100,
+          size,
+          color,
+          image: product.images?.[0] || '',
+        };
+      }) || [];
+
+      // 3. Format shipping address
+      const sd = expandedSession.shipping_details;
+      const shippingAddress = sd ? [
+        sd.name,
+        sd.address?.line1,
+        sd.address?.line2,
+        `${sd.address?.city}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code}`,
+        sd.address?.country
+      ].filter(Boolean).join('\n') : undefined;
+
+      // 4. Generate HTML
+      const emailHtml = generateOrderEmailHtml({
+        customerName,
+        orderNumber: expandedSession.id.slice(-8).toUpperCase(), // Use last 8 chars as order number
+        items,
+        region: expandedSession.metadata?.region || 'International',
+        shippingAddress,
+        total: (expandedSession.amount_total || 0) / 100,
+        currency: expandedSession.currency?.toUpperCase(),
+      });
+
+      // 5. Send Email to Customer
       if (customerEmail) {
-        // 2. Format items for the email
-        const items = expandedSession.line_items?.data.map((li: any) => {
-          const product = li.price?.product || {};
-          
-          // Parse size/color from description if available
-          let size;
-          let color;
-          if (product.description) {
-              const parts = product.description.split(' | ');
-              parts.forEach((p: string) => {
-                  if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
-                  if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
-              });
-          }
-
-          return {
-            name: product.name,
-            quantity: li.quantity || 1,
-            price: (li.price?.unit_amount || 0) / 100,
-            size,
-            color,
-            image: product.images?.[0] || '',
-          };
-        }) || [];
-
-        // 3. Format shipping address
-        const sd = expandedSession.shipping_details;
-        const shippingAddress = sd ? [
-          sd.name,
-          sd.address?.line1,
-          sd.address?.line2,
-          `${sd.address?.city}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code}`,
-          sd.address?.country
-        ].filter(Boolean).join('\n') : undefined;
-
-        // 4. Generate HTML
-        const emailHtml = generateOrderEmailHtml({
-          customerName,
-          orderNumber: expandedSession.id.slice(-8).toUpperCase(), // Use last 8 chars as order number
-          items,
-          region: expandedSession.metadata?.region || 'International',
-          shippingAddress,
-          total: (expandedSession.amount_total || 0) / 100,
-          currency: expandedSession.currency?.toUpperCase(),
-        });
-
-        // 5. Send Email
         await resend.emails.send({
           from: 'Rachel Goldberg Art <onboarding@resend.dev>',
           to: customerEmail,
           subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
           html: emailHtml,
         });
-
         console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
       }
+
+      // 6. Notify Merchant
+      await resend.emails.send({
+        from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+        to: PRIMARY_EMAIL,
+        cc: CC_EMAILS,
+        subject: `[Payment Successful] Order #${expandedSession.id.slice(-8).toUpperCase()}`,
+        html: `
+          <h2>Payment Received!</h2>
+          <p>A new order has been paid and confirmed.</p>
+          <hr>
+          <p><strong>Customer:</strong> ${customerName} (${customerEmail || 'No email'})</p>
+          <p><strong>Region:</strong> ${expandedSession.metadata?.region || 'International'}</p>
+          <p><strong>Total:</strong> $${((expandedSession.amount_total || 0) / 100).toFixed(2)} ${expandedSession.currency?.toUpperCase()}</p>
+          <hr>
+          <h3>Shipping Address:</h3>
+          <pre>${shippingAddress || 'N/A'}</pre>
+          <hr>
+          <h3>Order Details:</h3>
+          <ul>
+            ${items.map(i => `<li>${i.name} x ${i.quantity} (${i.size ? `Size: ${i.size}` : ''}${i.color ? `, Color: ${i.color}` : ''})</li>`).join('')}
+          </ul>
+        `,
+      });
+      console.log(`Sent merchant notification for session ${session.id}`);
+
     } catch (err: any) {
       console.error(`Error processing checkout session: ${err.message}`);
-      // We don't want to return 400 here because Stripe will retry, and the error might be with Resend or something else
-      // but let's at least log it.
     }
   }
 

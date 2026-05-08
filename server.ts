@@ -15,11 +15,32 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Stripe Webhook needs raw body for signature verification
+  app.post("/api/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+      const { default: handler } = await import("./api/webhook.ts");
+      await handler(req, res);
+    } catch (error) {
+      console.error("Webhook Handler Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   app.use(express.json());
 
   // API routes FIRST
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  app.get("/api/verify-session", async (req, res) => {
+    try {
+      const { default: handler } = await import("./api/verify-session.ts");
+      await handler(req, res);
+    } catch (error) {
+      console.error("Verify Session Handler Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   });
 
   app.post("/api/contact", async (req, res) => {

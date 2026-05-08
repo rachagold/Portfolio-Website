@@ -58,7 +58,48 @@ export default async function handler(req: any, res: any) {
         };
       }) || [];
 
-      return res.status(200).json({ items, region: region || 'International' });
+      // Trigger Transactional Email for Stripe (US/Canada)
+      // This ensures the customer gets their receipt immediately upon landing on the success page,
+      // acting as a backup/synchronization with the webhook.
+      const customerEmail = session.customer_details?.email;
+      if (customerEmail) {
+          try {
+              const emailHtml = generateOrderEmailHtml({
+                  customerName: session.customer_details?.name || 'Valued Customer',
+                  orderNumber: session.id.slice(-8).toUpperCase(),
+                  items: items.map((item: any) => ({
+                      name: item.product.name,
+                      quantity: item.quantity,
+                      price: item.unitPrice,
+                      size: item.selectedSize,
+                      color: item.selectedColor,
+                      image: item.product.image,
+                  })),
+                  region: region || (session.metadata?.region as string) || 'International',
+                  total: (session.amount_total || 0) / 100,
+                  currency: session.currency?.toUpperCase() || 'USD',
+                  shippingAddress: session.shipping_details ? [
+                      session.shipping_details.name,
+                      session.shipping_details.address?.line1,
+                      session.shipping_details.address?.line2,
+                      `${session.shipping_details.address?.city}${session.shipping_details.address?.state ? `, ${session.shipping_details.address.state}` : ''} ${session.shipping_details.address?.postal_code}`,
+                      session.shipping_details.address?.country
+                  ].filter(Boolean).join('\n') : undefined,
+              });
+
+              await resend.emails.send({
+                  from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+                  to: customerEmail,
+                  subject: `Thank you for your order! [#${session.id.slice(-8).toUpperCase()}]`,
+                  html: emailHtml,
+              });
+              console.log(`Sent Stripe transactional email to ${customerEmail}`);
+          } catch (emailErr) {
+              console.error('Failed to send Stripe transactional email:', emailErr);
+          }
+      }
+
+      return res.status(200).json({ items, region: region || session.metadata?.region || 'International' });
       
     } else if (token) {
       // Validate Cambodia HMAC Token

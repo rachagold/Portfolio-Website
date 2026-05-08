@@ -5,11 +5,12 @@ import { stripePromise } from '../utils/stripe';
 import { useCart } from './CartProvider';
 
 export function CartDrawer() {
-  const { isCartOpen, setIsCartOpen, items, removeFromCart, cartTotal, region } = useCart();
+  const { isCartOpen, setIsCartOpen, items, removeFromCart, cartTotal, region, location } = useCart();
   const [showCheckout, setShowCheckout] = useState(false);
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [hasAcknowledgedDelivery, setHasAcknowledgedDelivery] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState<'delivery' | 'pickup'>('delivery');
   
   // --- CAMBODIA STATE ---
   const [cambodiaStep, setCambodiaStep] = useState<'contact' | 'payment' | 'aba_scan' | 'success'>('contact');
@@ -34,7 +35,9 @@ export function CartDrawer() {
             selectedColor: item.selectedColor,
             image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '')
           })),
-          region: region
+          region: region,
+          location: location,
+          shippingMethod: shippingMethod
         }),
       });
 
@@ -104,9 +107,45 @@ export function CartDrawer() {
 
         {items.length > 0 && (
           <div className="p-6 border-t border-[#93312A]/20 bg-[#E5DCCD]">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-xl text-[#2D1F1C]">Subtotal:</span>
-              <span className="text-2xl font-medium text-[#2D1F1C]">${cartTotal.toFixed(2)}</span>
+            <div className="space-y-2 mb-6">
+              <div className="flex justify-between items-center text-[#2D1F1C]/70">
+                <span>Subtotal:</span>
+                <span>${cartTotal.toFixed(2)}</span>
+              </div>
+              {(region === 'International' || region === 'Canada') && (
+                <div className="flex justify-between items-center text-[#2D1F1C]/70">
+                  <span>Shipping ({shippingMethod === 'delivery' ? 'Delivery' : 'Pick up'}):</span>
+                  <span>{(() => {
+                    if (shippingMethod === 'pickup') return '$0.00';
+                    const onlyEligibleItems = items.every(item => 
+                      item.product.category === 'Postcards' || 
+                      (item.product.category === 'Prints' && item.selectedSize === 'A4')
+                    );
+                    const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+                    if (onlyEligibleItems && totalQty <= 4) return 'Free';
+                    return location === 'CA' ? '$12.00' : '$6.00';
+                  })()}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-[#93312A]/10">
+                <span className="text-xl text-[#2D1F1C]">Total:</span>
+                <span className="text-2xl font-medium text-[#2D1F1C]">
+                  ${(() => {
+                    let total = cartTotal;
+                    if ((region === 'International' || region === 'Canada') && shippingMethod === 'delivery') {
+                      const onlyEligibleItems = items.every(item => 
+                        item.product.category === 'Postcards' || 
+                        (item.product.category === 'Prints' && item.selectedSize === 'A4')
+                      );
+                      const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+                      if (!(onlyEligibleItems && totalQty <= 4)) {
+                        total += (location === 'CA' ? 12 : 6);
+                      }
+                    }
+                    return total.toFixed(2);
+                  })()}
+                </span>
+              </div>
             </div>
 
             {!showCheckout ? (
@@ -122,6 +161,50 @@ export function CartDrawer() {
             ) : (region === 'International' || region === 'Canada') ? (
               /* STRIPE BRANCH */
               <div className="space-y-4">
+                <div className="bg-[#93312A]/5 p-4 rounded-xl space-y-4 border border-[#93312A]/10">
+                  <p className="text-sm font-medium text-[#93312A] mb-2 uppercase tracking-wider">Shipping Method</p>
+                  <div className="space-y-3">
+                    <label className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${shippingMethod === 'delivery' ? 'bg-white border-[#93312A]/30 shadow-sm' : 'border-transparent hover:bg-white/50'}`}>
+                      <input 
+                        type="radio" 
+                        name="shippingMethod" 
+                        value="delivery" 
+                        checked={shippingMethod === 'delivery'} 
+                        onChange={() => setShippingMethod('delivery')}
+                        className="accent-[#93312A] w-4 h-4"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-[#2D1F1C]">Delivery</div>
+                        <div className="text-xs text-[#2D1F1C]/60">
+                          {(() => {
+                            const onlyEligibleItems = items.every(item => 
+                              item.product.category === 'Postcards' || 
+                              (item.product.category === 'Prints' && item.selectedSize === 'A4')
+                            );
+                            const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
+                            if (onlyEligibleItems && totalQty <= 4) return 'Free Delivery applied';
+                            return location === 'CA' ? '$12.00 Shipping' : '$6.00 Shipping';
+                          })()}
+                        </div>
+                      </div>
+                    </label>
+                    <label className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${shippingMethod === 'pickup' ? 'bg-white border-[#93312A]/30 shadow-sm' : 'border-transparent hover:bg-white/50'}`}>
+                      <input 
+                        type="radio" 
+                        name="shippingMethod" 
+                        value="pickup" 
+                        checked={shippingMethod === 'pickup'} 
+                        onChange={() => setShippingMethod('pickup')}
+                        className="accent-[#93312A] w-4 h-4"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-[#2D1F1C]">Pick up</div>
+                        <div className="text-xs text-[#2D1F1C]/60">I will pick up directly from Rachel this summer! ($0.00)</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
                 {!hasAcknowledgedDelivery && (
                   <div className="bg-[#93312A]/10 p-4 rounded-lg border border-[#93312A]/20">
                     <label className="flex items-start gap-3 cursor-pointer">
