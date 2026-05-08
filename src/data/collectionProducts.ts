@@ -643,13 +643,19 @@ for (const p of collectionProducts) {
       delete p.sizeImages['A6 (Post card)'];
     }
     
-    // 2. Build new valid images array using fuzzy logic
+    // 2. Build new valid images array using fuzzy logic for Postcards
     const validImages = p.images.filter(img => {
       const lower = img.toLowerCase();
       return lower.includes('print 2') || 
              lower.includes('post card') || 
              lower.includes('postcard') || 
              lower.includes('print.png');
+    });
+
+    // 3. Remove postcard-specific images from the original Print product
+    p.images = p.images.filter(img => {
+      const lower = img.toLowerCase();
+      return !lower.includes('post card') && !lower.includes('postcard');
     });
 
     // Strategy to pick image cover:

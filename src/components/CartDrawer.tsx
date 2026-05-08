@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { X, ShoppingBag, QrCode } from 'lucide-react';
 import { stripePromise } from '../utils/stripe';
 import { useCart } from './CartProvider';
+import { getCurrencyPrefix } from '../lib/pricing';
 
 export function CartDrawer() {
   const { isCartOpen, setIsCartOpen, items, removeFromCart, cartTotal, region, location } = useCart();
@@ -10,7 +11,6 @@ export function CartDrawer() {
   const [preorderData, setPreorderData] = useState({ name: '', email: '', phone: '', contactMethod: 'whatsapp' as 'whatsapp' | 'phone' });
   const [preorderStatus, setPreorderStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [hasAcknowledgedDelivery, setHasAcknowledgedDelivery] = useState(false);
-  const [shippingMethod, setShippingMethod] = useState<'delivery' | 'pickup'>('delivery');
   
   // --- CAMBODIA STATE ---
   const [cambodiaStep, setCambodiaStep] = useState<'contact' | 'payment' | 'aba_scan' | 'success'>('contact');
@@ -18,6 +18,7 @@ export function CartDrawer() {
   const [isSubmittingCambodia, setIsSubmittingCambodia] = useState(false);
   const [cambodiaToken, setCambodiaToken] = useState<string | null>(null);
   const hasOriginals = items.some((i) => i.product.category === 'Originals');
+  const currencyPrefix = getCurrencyPrefix(location);
 
   // --- STRIPE LOGIC START ---
   const handleCheckout = async () => {
@@ -36,8 +37,7 @@ export function CartDrawer() {
             image: item.product.image || (item.product.images && item.product.images.length > 0 ? item.product.images[0] : '')
           })),
           region: region,
-          location: location,
-          shippingMethod: shippingMethod
+          location: location
         }),
       });
 
@@ -92,7 +92,7 @@ export function CartDrawer() {
                       {item.selectedSize && item.selectedColor && ', '}
                       {item.selectedColor && `Color: ${item.selectedColor}`}
                     </p>
-                    <p className="text-[#2D1F1C] mt-1">${(item.unitPrice || item.product.price).toFixed(2)} x {item.quantity}</p>
+                    <p className="text-[#2D1F1C] mt-1">{currencyPrefix}{(item.unitPrice || item.product.price).toFixed(2)} x {item.quantity}</p>
                   </div>
                   <button onClick={() => removeFromCart(item.product.id, item.selectedColor, item.selectedSize)}
                     className="p-1 hover:bg-black/5 rounded-full text-[#2D1F1C]/50 hover:text-[#2D1F1C] transition-colors"
@@ -110,40 +110,15 @@ export function CartDrawer() {
             <div className="space-y-2 mb-6">
               <div className="flex justify-between items-center text-[#2D1F1C]/70">
                 <span>Subtotal:</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>{currencyPrefix}{cartTotal.toFixed(2)}</span>
               </div>
-              {(region === 'International' || region === 'Canada') && (
-                <div className="flex justify-between items-center text-[#2D1F1C]/70">
-                  <span>Shipping ({shippingMethod === 'delivery' ? 'Delivery' : 'Pick up'}):</span>
-                  <span>{(() => {
-                    if (shippingMethod === 'pickup') return '$0.00';
-                    const onlyEligibleItems = items.every(item => 
-                      item.product.category === 'Postcards' || 
-                      (item.product.category === 'Prints' && item.selectedSize === 'A4')
-                    );
-                    const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-                    if (onlyEligibleItems && totalQty <= 4) return 'Free';
-                    return location === 'CA' ? '$12.00' : '$6.00';
-                  })()}</span>
-                </div>
-              )}
               <div className="flex justify-between items-center pt-2 border-t border-[#93312A]/10">
-                <span className="text-xl text-[#2D1F1C]">Total:</span>
+                <div className="flex flex-col">
+                  <span className="text-xl text-[#2D1F1C]">Total:</span>
+                  <span className="text-xs text-[#2D1F1C]/50">Shipping calculated at checkout</span>
+                </div>
                 <span className="text-2xl font-medium text-[#2D1F1C]">
-                  ${(() => {
-                    let total = cartTotal;
-                    if ((region === 'International' || region === 'Canada') && shippingMethod === 'delivery') {
-                      const onlyEligibleItems = items.every(item => 
-                        item.product.category === 'Postcards' || 
-                        (item.product.category === 'Prints' && item.selectedSize === 'A4')
-                      );
-                      const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-                      if (!(onlyEligibleItems && totalQty <= 4)) {
-                        total += (location === 'CA' ? 12 : 6);
-                      }
-                    }
-                    return total.toFixed(2);
-                  })()}
+                  {currencyPrefix}{cartTotal.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -161,49 +136,6 @@ export function CartDrawer() {
             ) : (region === 'International' || region === 'Canada') ? (
               /* STRIPE BRANCH */
               <div className="space-y-4">
-                <div className="bg-[#93312A]/5 p-4 rounded-xl space-y-4 border border-[#93312A]/10">
-                  <p className="text-sm font-medium text-[#93312A] mb-2 uppercase tracking-wider">Shipping Method</p>
-                  <div className="space-y-3">
-                    <label className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${shippingMethod === 'delivery' ? 'bg-white border-[#93312A]/30 shadow-sm' : 'border-transparent hover:bg-white/50'}`}>
-                      <input 
-                        type="radio" 
-                        name="shippingMethod" 
-                        value="delivery" 
-                        checked={shippingMethod === 'delivery'} 
-                        onChange={() => setShippingMethod('delivery')}
-                        className="accent-[#93312A] w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-[#2D1F1C]">Delivery</div>
-                        <div className="text-xs text-[#2D1F1C]/60">
-                          {(() => {
-                            const onlyEligibleItems = items.every(item => 
-                              item.product.category === 'Postcards' || 
-                              (item.product.category === 'Prints' && item.selectedSize === 'A4')
-                            );
-                            const totalQty = items.reduce((sum, item) => sum + item.quantity, 0);
-                            if (onlyEligibleItems && totalQty <= 4) return 'Free Delivery applied';
-                            return location === 'CA' ? '$12.00 Shipping' : '$6.00 Shipping';
-                          })()}
-                        </div>
-                      </div>
-                    </label>
-                    <label className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${shippingMethod === 'pickup' ? 'bg-white border-[#93312A]/30 shadow-sm' : 'border-transparent hover:bg-white/50'}`}>
-                      <input 
-                        type="radio" 
-                        name="shippingMethod" 
-                        value="pickup" 
-                        checked={shippingMethod === 'pickup'} 
-                        onChange={() => setShippingMethod('pickup')}
-                        className="accent-[#93312A] w-4 h-4"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-[#2D1F1C]">Pick up</div>
-                        <div className="text-xs text-[#2D1F1C]/60">I will pick up directly from Rachel this summer! ($0.00)</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
 
                 {!hasAcknowledgedDelivery && (
                   <div className="bg-[#93312A]/10 p-4 rounded-lg border border-[#93312A]/20">
@@ -226,7 +158,7 @@ export function CartDrawer() {
                   disabled={!hasAcknowledgedDelivery}
                   className="w-full py-4 bg-[#779C91] hover:bg-[#5E857A] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full font-medium transition-colors text-lg"
                 >
-                  Pay with Card ({region === 'Canada' ? 'CAD' : 'USD'})
+                  Pay with Card ({location === 'CA' ? 'CAD' : 'USD'})
                 </button>
                 <button
                   onClick={() => setShowCheckout(false)}

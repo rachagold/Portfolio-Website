@@ -25,10 +25,10 @@ interface TileProps {
 }
 
 function ProductTile({ label, tile }: TileProps) {
-  const { region } = useCart();
+  const { region, location } = useCart();
   const product = products.find((p) => p.slug === tile.slug);
   const priceStr = product
-    ? getPriceRange(product, region)
+    ? getPriceRange(product, region, location)
     : '';
 
   return (

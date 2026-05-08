@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    const { items, region, location, shippingMethod } = req.body;
+    const { items, region, location } = req.body;
 
     // 1. Validate environment variables
     const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -66,9 +66,9 @@ export default async function handler(req: any, res: any) {
             };
         });
 
-        // Shipping Logic (re-calculated on backend for security)
-        let shippingFee = 0;
-        if (shippingMethod === 'delivery' && (location === 'US' || location === 'CA')) {
+        // Calculate Delivery Fee (fixed rates for US/CA, with free override)
+        let deliveryFee = 0;
+        if (location === 'US' || location === 'CA') {
             const onlyEligibleItems = items.every((item: any) => 
                 item.category === 'Postcards' || 
                 (item.category === 'Prints' && item.selectedSize === 'A4')
@@ -76,34 +76,30 @@ export default async function handler(req: any, res: any) {
             const totalQty = items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
             
             if (!(onlyEligibleItems && totalQty <= 4)) {
-                shippingFee = location === 'CA' ? 12 : 6;
+                deliveryFee = location === 'CA' ? 12 : 6;
             }
         }
 
-        // Add Shipping as a line item if applicable
-        if (shippingFee > 0) {
-            line_items.push({
-                price_data: {
-                    currency: currency,
-                    product_data: {
-                        name: 'Shipping (Delivery)',
-                        description: `Shipping to ${location === 'CA' ? 'Canada' : 'United States'}`,
-                    },
-                    unit_amount: Math.round(shippingFee * 100),
+        // Define Shipping Options for Stripe
+        const shipping_options: any[] = [];
+        if (location === 'US' || location === 'CA') {
+            shipping_options.push({
+                shipping_rate_data: {
+                    type: 'fixed_amount',
+                    fixed_amount: { amount: deliveryFee * 100, currency: currency },
+                    display_name: 'Delivery',
+                    delivery_estimate: {
+                      minimum: { unit: 'business_day', value: 3 },
+                      maximum: { unit: 'business_day', value: 7 },
+                    }
                 },
-                quantity: 1,
             });
-        } else if (shippingMethod === 'pickup') {
-            line_items.push({
-                price_data: {
-                    currency: currency,
-                    product_data: {
-                        name: 'Pick up - I will pick up directly from Rachel this summer!',
-                        description: 'No shipping address required.',
-                    },
-                    unit_amount: 0,
+            shipping_options.push({
+                shipping_rate_data: {
+                    type: 'fixed_amount',
+                    fixed_amount: { amount: 0, currency: currency },
+                    display_name: 'Pick up - I will pick up directly from Rachel this summer!',
                 },
-                quantity: 1,
             });
         }
 
@@ -122,8 +118,7 @@ export default async function handler(req: any, res: any) {
                 discountable_subtotal: discountableSubtotal.toString(),
                 region: region || 'International',
                 location: location || 'Unknown',
-                shipping_method: shippingMethod || 'delivery',
-                shipping_fee: shippingFee.toString(),
+                base_delivery_fee: deliveryFee.toString(),
             },
             success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&region=${region}`,
             cancel_url: `${baseUrl}/`,
@@ -132,9 +127,10 @@ export default async function handler(req: any, res: any) {
                     message: "Discounts apply to merchandise only and exclude original artworks."
                 }
             },
-            shipping_address_collection: shippingMethod === 'pickup' ? undefined : {
+            shipping_address_collection: (location === 'US' || location === 'CA') ? {
                 allowed_countries: ['US', 'CA'],
-            },
+            } : undefined,
+            shipping_options: shipping_options.length > 0 ? shipping_options : undefined,
             phone_number_collection: {
                 enabled: true,
             },

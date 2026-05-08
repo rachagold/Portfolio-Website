@@ -5,7 +5,7 @@ import { Lens } from '../../components/Lens';
 import { products } from '../../data/products';
 import { COLLECTIONS } from '../../data/collections';
 import { useCart } from '../../components/CartProvider';
-import { getPrice, getBasePrice, getPriceRange } from '../../lib/pricing';
+import { getPrice, getBasePrice, getPriceRange, getCurrencyPrefix } from '../../lib/pricing';
 import { ChevronRight, ChevronDown, Minus, Plus } from 'lucide-react';
 
 /** Resolve which collection (if any) a product belongs to, for breadcrumb */
@@ -38,7 +38,8 @@ function resolveTypeLabel(slug: string): string {
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const product = products.find((p) => p.slug === slug);
-  const { addToCart, region } = useCart();
+  const { addToCart, region, location } = useCart();
+  const currencyPrefix = getCurrencyPrefix(location);
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState('');
@@ -63,9 +64,9 @@ export function ProductDetail() {
   // Price update on selection
   useEffect(() => {
     if (product) {
-      setDisplayPrice(getPrice(product, region, selectedSize || undefined));
+      setDisplayPrice(getPrice(product, region, selectedSize || undefined, location));
     }
-  }, [selectedSize, product, region]);
+  }, [selectedSize, product, region, location]);
 
   const handleSizeChange = (size: string) => {
     setSelectedSize(size);
@@ -273,7 +274,7 @@ export function ProductDetail() {
         {/* ── Details ────────────────────────────────────────────────────── */}
         <AnimatedSection direction="left" delay={0.2}>
           <h1 className="text-4xl md:text-5xl font-serif text-[#93312A] mb-4">{product.name}</h1>
-          <p className="text-2xl text-[#2D1F1C] mb-8">${displayPrice.toFixed(2)}</p>
+          <p className="text-2xl text-[#2D1F1C] mb-8">{currencyPrefix}{displayPrice.toFixed(2)}</p>
 
           {/* Category-specific copy */}
           <div className="text-[#2D1F1C]/80 text-sm mb-10 leading-relaxed space-y-2">
@@ -520,7 +521,7 @@ export function ProductDetail() {
                   )}
                 </div>
                 <h3 className="font-medium text-[#2D1F1C] mb-1 text-sm">{rp.name}</h3>
-                <p className="text-[#2D1F1C]/60 text-sm">{getPriceRange(rp, region)}</p>
+                <p className="text-[#2D1F1C]/60 text-sm">{getPriceRange(rp, region, location)}</p>
               </Link>
             ))}
           </div>

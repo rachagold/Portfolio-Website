@@ -75,7 +75,7 @@ function OriginalsBox() {
 }
 
 export function Shop() {
-  const { region } = useCart();
+  const { region, location } = useCart();
   const [activeFilter, setActiveFilter] = useState('Show All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -229,7 +229,7 @@ export function Shop() {
                         </p>
                       )}
                       <p className="text-[#93312A] font-medium">
-                        {getPriceRange(product, region)}
+                        {getPriceRange(product, region, location)}
                       </p>
                     </div>
                   </Link>

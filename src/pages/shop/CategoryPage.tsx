@@ -10,7 +10,7 @@ import { truncateDescription } from '../../lib/utils';
 
 export function CategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
-  const { region } = useCart();
+  const { region, location } = useCart();
 
   // Map slugs like 'postcards', 'tees', 'prints' back to correct Category name or display name.
   // Note: For now, we will perform a case-insensitive filtering against product.category.
@@ -73,7 +73,7 @@ export function CategoryPage() {
                   </p>
                 )}
                 <p className="text-[#93312A] font-medium">
-                  {getPriceRange(product, region)}
+                  {getPriceRange(product, region, location)}
                 </p>
               </div>
             </Link>

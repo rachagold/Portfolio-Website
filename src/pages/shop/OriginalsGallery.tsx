@@ -9,7 +9,7 @@ import { truncateDescription } from '../../lib/utils';
 
 
 export function OriginalsGallery() {
-  const { region } = useCart();
+  const { region, location } = useCart();
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -62,7 +62,7 @@ export function OriginalsGallery() {
                   </p>
                 )}
                 <p className="text-[#93312A] font-medium">
-                  {getPriceRange(product, region)}
+                  {getPriceRange(product, region, location)}
                 </p>
               </div>
             </Link>
