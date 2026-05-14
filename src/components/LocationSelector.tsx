@@ -31,9 +31,8 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
 
   const locations = [
     { name: 'United States', loc: 'US', reg: 'International' },
-    { name: 'Canada', loc: 'CA', reg: 'International' },
     { name: 'Cambodia', loc: 'KH', reg: 'Cambodia' },
-    { name: 'Other', loc: 'Other', reg: 'Other' },
+    { name: 'Not US / Cambodia', loc: 'Other', reg: 'Other' },
   ];
 
   return (
@@ -90,7 +89,7 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
           </div>
 
           <footer className="mt-16 text-center text-[#2D1F1C]/40 text-sm">
-            Can't find your location? Select "Other" to browse, or contact Rachel directly.
+            Can't find your location? Select "Not US / Cambodia" to browse, or contact Rachel directly.
           </footer>
         </div>
       </motion.div>

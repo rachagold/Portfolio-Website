@@ -89,17 +89,17 @@ export const paintings: Painting[] = [
     ...p('cambodia', 'independence'),
     status: 'Available'
   },
-  {
-    id: 'c7',
-    title: 'Battambang',
-    year: '2026',
-    medium: 'Acrylic on Canvas',
-    description: 'This piece reflects a space that exists just beyond crowded streets and a nightly spectacle. People gather nearby, but remains outside the frame. Human presence exists is only suggested as the energy comes from the familiar market symbols, layered textures, and the rhythm of the city itself.',
-    collection: 'Cambodia',
-    subCollection: 'Main Series',
-    ...p('cambodia', 'battambang', { t: 'png' }), 
-    status: 'Hidden'
-  },
+  // {
+  //   id: 'c7',
+  //   title: 'Battambang',
+  //   year: '2026',
+  //   medium: 'Acrylic on Canvas',
+  //   description: 'This piece reflects a space that exists just beyond crowded streets and a nightly spectacle. People gather nearby, but remains outside the frame. Human presence exists is only suggested as the energy comes from the familiar market symbols, layered textures, and the rhythm of the city itself.',
+  //   collection: 'Cambodia',
+  //   subCollection: 'Main Series',
+  //   ...p('cambodia', 'battambang', { t: 'png' }), 
+  //   status: 'Hidden'
+  // },
   {
     id: 'c8',
     title: 'Phnom Penh 2026',
