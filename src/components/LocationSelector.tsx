@@ -97,7 +97,7 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
               onClick={() => handleSelect('Other', 'Other')}
               className="text-[#2D1F1C]/60 hover:text-[#93312A] hover:bg-[#93312A]/5 px-6 py-3 rounded-full transition-all border border-transparent hover:border-[#93312A]/10 text-lg"
             >
-              Not US / Cambodia
+              Outside US / Cambodia
             </button>
           </motion.div>
 
