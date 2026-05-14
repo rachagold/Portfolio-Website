@@ -72,11 +72,11 @@ export function Home() {
 
             <div className="relative z-10">
               <span className="inline-block bg-white text-[#93312A] text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">
-                Closing Ceremony
+                Afterglow Event
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif mb-2">Sra'Art: Geo Graphic</h2>
-              <p className="text-white/80 text-sm mb-1">Final Day: April 8, 2026 | Phnom Penh, Cambodia</p>
-              <p className="text-white/70 text-sm max-w-md">Last chance to view the Geo Graphic collection before it closes forever on April 8.</p>
+              <h2 className="text-3xl md:text-4xl font-serif mb-2">Artist Talk & Live Painting</h2>
+              <p className="text-white/80 text-sm mb-1">May 21st | Sra'Art, Phnom Penh, Cambodia</p>
+              <p className="text-white/70 text-sm max-w-md">Last chance to view the Geo Graphic collection before it closes forever.</p>
             </div>
 
             <Link to="/exhibition" className="relative z-10 whitespace-nowrap bg-[#779C91] hover:bg-[#5E857A] text-white px-8 py-3 rounded-full transition-colors font-medium">

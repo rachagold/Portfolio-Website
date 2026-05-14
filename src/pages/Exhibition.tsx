@@ -51,14 +51,14 @@ export function Exhibition() {
 
           <AnimatedSection direction="left" delay={0.2} className="order-1 lg:order-2">
             <span className="inline-block bg-[#779C91] text-white text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-              Closing Ceremony
+              Afterglow Event
             </span>
             <h1 className="text-5xl md:text-7xl font-serif text-[#2D1F1C] mb-6 leading-tight">
               Sra'Art: Geo Graphic
             </h1>
             <div className="text-xl md:text-2xl text-[#2D1F1C]/80 mb-8 font-light">
-              <p className="mb-2 text-[#93312A] font-bold">Closing Ceremony: April 8, 2026</p>
-              <p className="mb-2">Final Day to view the collection: April 8, 2026</p>
+              <p className="mb-2 text-[#93312A] font-bold">Artist Talk & Live Painting: May 21st, 2026</p>
+              <p className="mb-2">Final Day to view the collection: May 21st, 2026</p>
               <p>Phnom Penh, Cambodia</p>
             </div>
           </AnimatedSection>
@@ -83,22 +83,22 @@ export function Exhibition() {
             <div className="bg-[#EAE6DF] rounded-3xl p-8 md:p-10 border border-[#93312A]/10">
               <div className="space-y-6 mb-10">
                 <div>
-                   <h3 className="font-bold text-[#2D1F1C] mb-1">Closing Ceremony:</h3>
-                   <p className="text-[#2D1F1C]/80">April 8, 2026</p>
+                   <h3 className="font-bold text-[#2D1F1C] mb-1">Artist Talk & Live Painting:</h3>
+                   <p className="text-[#2D1F1C]/80">May 21st, 2026</p>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#2D1F1C] mb-1">Absolute Last Day:</h3>
-                  <p className="text-[#2D1F1C]/80">April 8, 2026</p>
+                  <p className="text-[#2D1F1C]/80">May 21st, 2026</p>
                 </div>
                 <div>
                   <h3 className="font-bold text-[#2D1F1C] mb-1">Location:</h3>
-                  <p className="text-[#2D1F1C]/80">Phnom Penh, Cambodia</p>
+                  <p className="text-[#2D1F1C]/80">Sra'Art, Phnom Penh, Cambodia</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <a 
-                  href="https://www.facebook.com/share/18hZK6ED4W/?mibextid=wwXIfr" 
+                  href="https://www.facebook.com/share/1LetuCKCBP/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="flex items-center justify-center gap-2 w-full text-center bg-[#93312A] text-white hover:opacity-90 px-8 py-4 rounded-full font-medium transition-all"
