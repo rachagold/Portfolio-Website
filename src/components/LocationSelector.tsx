@@ -32,7 +32,6 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
   const locations = [
     { name: 'United States', loc: 'US', reg: 'International' },
     { name: 'Cambodia', loc: 'KH', reg: 'Cambodia' },
-    { name: 'Not US / Cambodia', loc: 'Other', reg: 'Other' },
   ];
 
   return (
@@ -88,8 +87,22 @@ export function LocationSelector({ onClose, forceOpen }: LocationSelectorProps) 
             ))}
           </div>
 
-          <footer className="mt-16 text-center text-[#2D1F1C]/40 text-sm">
-            Can't find your location? Select "Not US / Cambodia" to browse, or contact Rachel directly.
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 flex justify-center"
+          >
+            <button
+              onClick={() => handleSelect('Other', 'Other')}
+              className="text-[#2D1F1C]/60 hover:text-[#93312A] hover:bg-[#93312A]/5 px-6 py-3 rounded-full transition-all border border-transparent hover:border-[#93312A]/10 text-lg"
+            >
+              Not US / Cambodia
+            </button>
+          </motion.div>
+
+          <footer className="mt-12 text-center text-[#2D1F1C]/40 text-sm">
+            Questions? Contact Rachel directly.
           </footer>
         </div>
       </motion.div>
