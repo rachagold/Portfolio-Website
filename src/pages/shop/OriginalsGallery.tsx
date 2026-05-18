@@ -9,7 +9,12 @@ import { truncateDescription } from '../../lib/utils';
 
 
 export function OriginalsGallery() {
-  const { region, location } = useCart();
+  const { region, location, soldOriginalNames } = useCart();
+
+  // Filter out sold originals — they remain on the portfolio page but not the shop
+  const availableOriginals = originalArtworks.filter(
+    (p) => !soldOriginalNames.includes(p.name)
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -32,7 +37,7 @@ export function OriginalsGallery() {
 
       {/* Grid */}
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
-        {originalArtworks.map((product, i) => (
+        {availableOriginals.map((product, i) => (
           <AnimatedSection key={product.id} delay={i * 0.05} className="break-inside-avoid mb-6">
             <Link
               to={`/shop/${product.slug}`}
@@ -68,6 +73,12 @@ export function OriginalsGallery() {
             </Link>
           </AnimatedSection>
         ))}
+
+        {availableOriginals.length === 0 && (
+          <div className="text-center py-24 text-[#2D1F1C]/50 w-full">
+            All original artworks have been sold. Check back soon for new works.
+          </div>
+        )}
       </div>
 
       {/* back link */}

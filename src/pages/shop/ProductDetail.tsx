@@ -38,8 +38,10 @@ function resolveTypeLabel(slug: string): string {
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const product = products.find((p) => p.slug === slug);
-  const { addToCart, region, location } = useCart();
+  const { addToCart, region, location, soldOriginalNames } = useCart();
   const currencyPrefix = getCurrencyPrefix(location);
+
+  const isSoldOriginal = product?.category === 'Originals' && soldOriginalNames.includes(product.name);
 
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState('');
@@ -299,6 +301,13 @@ export function ProductDetail() {
             </div>
           )}
 
+          {/* Sold original notice */}
+          {isSoldOriginal && (
+            <div className="mb-6 px-4 py-3 bg-[#2D1F1C]/10 rounded-xl text-[#2D1F1C] text-sm font-medium">
+              This original artwork has been sold. It remains part of the portfolio for viewing.
+            </div>
+          )}
+
           {/* Size selector */}
           {product.sizes && product.sizes.length > 0 && (
             <div className="mb-6">
@@ -353,6 +362,15 @@ export function ProductDetail() {
               <p className="text-[#2D1F1C]/50 text-sm text-center italic">
                 To arrange a special order for your location.
               </p>
+            </div>
+          ) : isSoldOriginal ? (
+            <div className="mb-12">
+              <button
+                disabled
+                className="w-full py-4 rounded-full text-lg font-medium bg-[#2D1F1C]/20 cursor-not-allowed text-[#2D1F1C]/50"
+              >
+                Sold
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-4 mb-12">
@@ -460,14 +478,22 @@ export function ProductDetail() {
               )}
               {activeTab === 'Shipping' && (
                 <div className="space-y-3">
-                  <p>
-                    Local delivery available in Phnom Penh and surrounding areas via Grab. Share your
-                    location using a Google Maps link or Grab pin when checking out.
-                  </p>
-                  <p>
-                    International orders will not be delivered until July 2026. Rachel will reach out
-                    to confirm your order.
-                  </p>
+                  {region === 'Cambodia' ? (
+                    <>
+                      <p>
+                        Cambodia Pre-Orders Only — Delivering Mid-June.
+                      </p>
+                      <p>
+                        Local delivery available in Phnom Penh and surrounding areas via Grab. Share your
+                        location using a Google Maps link or Grab pin when checking out.
+                      </p>
+                    </>
+                  ) : (
+                    <p>
+                      International orders will not be delivered until July 2026. Rachel will reach out
+                      to confirm your order.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

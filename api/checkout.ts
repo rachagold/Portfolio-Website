@@ -59,6 +59,8 @@ export default async function handler(req: any, res: any) {
                         name: item.name,
                         description: [item.selectedSize && `Size: ${item.selectedSize}`, item.selectedColor && `Color: ${item.selectedColor}`].filter(Boolean).join(' | ') || undefined,
                         images: imageUrls,
+                        // Include category so webhook can detect original artwork purchases
+                        metadata: { category: item.category || '' },
                     },
                     unit_amount: Math.round((item.price || 0) * 100),
                 },

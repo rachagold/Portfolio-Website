@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import crypto from 'crypto';
 import { Resend } from 'resend';
 import { generateOrderEmailHtml } from './_utils/email-template';
+import { markOriginalSold } from './_utils/sold-originals';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -167,6 +168,18 @@ export default async function handler(req: any, res: any) {
           selectedSize: item.size || item.selectedSize,
           selectedColor: item.color || item.selectedColor,
       }));
+
+      // Mark any original artworks as sold so they are removed from both shops
+      try {
+        for (const item of data.items) {
+          if (item.category === 'Originals' && item.name) {
+            await markOriginalSold(item.name);
+            console.log(`[ABA] Marked original artwork as sold: ${item.name}`);
+          }
+        }
+      } catch (soldErr: any) {
+        console.error(`[ABA] Error marking originals as sold: ${soldErr.message}`);
+      }
 
       return res.status(200).json({ items, region: data.region });
     }

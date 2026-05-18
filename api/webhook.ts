@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { generateOrderEmailHtml } from './_utils/email-template';
+import { markOriginalSold } from './_utils/sold-originals';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -144,6 +145,21 @@ export default async function handler(req: any, res: any) {
         `,
       });
       console.log(`Sent merchant notification for session ${session.id}`);
+
+      // 7. Mark any original artworks as sold so they are removed from both shops
+      try {
+        for (const li of (expandedSession.line_items?.data || [])) {
+          const product = (li as any).price?.product;
+          // Originals are sent to Stripe with category in product metadata (set in checkout.ts)
+          const isOriginal = product?.metadata?.category === 'Originals';
+          if (isOriginal && product?.name) {
+            await markOriginalSold(product.name);
+            console.log(`Marked original artwork as sold: ${product.name}`);
+          }
+        }
+      } catch (soldErr: any) {
+        console.error(`Error marking originals as sold: ${soldErr.message}`);
+      }
 
     } catch (err: any) {
       console.error(`Error processing checkout session: ${err.message}`);

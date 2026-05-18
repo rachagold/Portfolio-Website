@@ -68,7 +68,7 @@ export function Success() {
           <h3 className="font-serif text-xl text-[#93312A] mb-2">Delivery Information</h3>
           {orderRegion === 'Cambodia' ? (
             <p className="text-[#2D1F1C]/80">
-              You will receive a personal message shortly to coordinate Grab delivery.
+              Delivery begins in Mid-June. You will receive a message in June to coordinate Grab delivery.
             </p>
           ) : (
             <p className="text-[#2D1F1C]/80">

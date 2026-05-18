@@ -21,31 +21,36 @@ function CollectionBox({ col }: { col: (typeof COLLECTIONS)[number] }) {
   return (
     <Link
       to={`/shop/collection/${col.slug}`}
-      className="group relative overflow-hidden rounded-2xl bg-[#EAE6DF] block aspect-[3/2]"
+      className="group flex flex-col md:relative md:overflow-hidden md:rounded-2xl md:bg-[#EAE6DF] md:block md:aspect-[3/2]"
     >
-      {col.coverImage ? (
-        <img
-          src={col.coverImage}
-          alt={col.displayName}
-          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-85"
-        />
-      ) : (
-        <div className="aspect-[4/3] bg-[#EAE6DF] flex items-center justify-center">
-          <span className="text-[#2D1F1C]/30 text-sm font-medium uppercase tracking-widest">
-            {col.name}
-          </span>
-        </div>
-      )}
+      {/* title (above on mobile, absolute overlap on desktop) */}
+      <div className="mb-2 md:mb-0 md:absolute md:bottom-0 md:left-0 md:right-0 md:p-5 z-10">
+        <p className="text-[#2D1F1C] md:text-white font-serif text-lg md:text-xl leading-tight md:drop-shadow-md">
+          {col.displayName}
+        </p>
+      </div>
 
-      {/* gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+      {/* image wrapper (rounded on mobile, regular on desktop) */}
+      <div className="relative flex-1 aspect-[3/2] w-full overflow-hidden rounded-2xl bg-[#EAE6DF] md:absolute md:inset-0 md:w-full md:h-full md:rounded-none md:bg-transparent">
+        {col.coverImage ? (
+          <img
+            src={col.coverImage}
+            alt={col.displayName}
+            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-85"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#EAE6DF] flex items-center justify-center">
+            <span className="text-[#2D1F1C]/30 text-sm font-medium uppercase tracking-widest">
+              {col.name}
+            </span>
+          </div>
+        )}
 
-      {/* OOS badge */}
-      {!col.coverImage && <OOSBadge />}
+        {/* gradient overlay (only on desktop) */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
-      {/* title */}
-      <div className="absolute bottom-0 left-0 right-0 p-5">
-        <p className="text-white font-serif text-xl leading-tight drop-shadow-md">{col.displayName}</p>
+        {/* OOS badge */}
+        {!col.coverImage && <OOSBadge />}
       </div>
     </Link>
   );
@@ -55,27 +60,35 @@ function OriginalsBox() {
   return (
     <Link
       to={ORIGINALS_BOX.href}
-      className="group relative overflow-hidden rounded-2xl bg-[#2D1F1C] block aspect-[3/2]"
+      className="group flex flex-col md:relative md:overflow-hidden md:rounded-2xl md:block md:aspect-[3/2]"
     >
-      <img
-        src={ORIGINALS_BOX.thumbnail}
-        alt="See More Originals"
-        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-75"
-      />
-      {/* dark scrim */}
-      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-500 pointer-events-none" />
-      {/* CTA button — centre-aligned, no title */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="px-6 py-3 bg-white text-[#2D1F1C] text-sm font-semibold uppercase tracking-widest rounded-full transition-all duration-300 group-hover:bg-[#93312A] group-hover:text-white shadow-lg">
-          See More Originals
-        </span>
+      {/* invisible spacer on mobile to align image tops with adjacent CollectionBox */}
+      <div className="mb-2 md:mb-0 md:hidden invisible select-none pointer-events-none" aria-hidden="true">
+        <p className="font-serif text-lg leading-tight">&nbsp;</p>
+      </div>
+
+      {/* image wrapper (rounded on mobile, regular on desktop) */}
+      <div className="relative flex-1 aspect-[3/2] w-full overflow-hidden rounded-2xl bg-[#2D1F1C] md:absolute md:inset-0 md:w-full md:h-full md:rounded-none md:bg-transparent">
+        <img
+          src={ORIGINALS_BOX.thumbnail}
+          alt="See More Originals"
+          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-75"
+        />
+        {/* dark scrim */}
+        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors duration-500 pointer-events-none" />
+        {/* CTA button — centre-aligned, no title */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="px-6 py-3 bg-white text-[#2D1F1C] text-sm font-semibold uppercase tracking-widest rounded-full transition-all duration-300 group-hover:bg-[#93312A] group-hover:text-white shadow-lg text-center whitespace-nowrap">
+            See More Originals
+          </span>
+        </div>
       </div>
     </Link>
   );
 }
 
 export function Shop() {
-  const { region, location } = useCart();
+  const { region, location, soldOriginalNames } = useCart();
   const [activeFilter, setActiveFilter] = useState('Show All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -100,8 +113,11 @@ export function Shop() {
   };
 
   const currentCategory = getCategoryFromFilter(activeFilter);
-  const filteredProducts = currentCategory 
-    ? products.filter(p => p.category === currentCategory)
+  const filteredProducts = currentCategory
+    ? products
+        .filter(p => p.category === currentCategory)
+        // For originals, hide any that have been sold
+        .filter(p => p.category !== 'Originals' || !soldOriginalNames.includes(p.name))
     : [];
 
   return (
@@ -120,7 +136,8 @@ export function Shop() {
         <AnimatedSection className="mb-8">
           <div className="bg-[#F5F0E8] border-l-4 border-[#779C91] rounded-r-2xl p-5">
             <p className="text-[#2D1F1C]/80">
-              <span className="font-semibold text-[#93312A]">Cambodia Shop —</span>{' '}
+              <span className="font-semibold text-[#93312A]">Cambodia —</span>{' '}
+              Delivery Mid-June or Visit Sra'Art for Pick Up<br />
               Payment via ABA&nbsp;|&nbsp;Delivery via Grab Phnom Penh.
             </p>
           </div>

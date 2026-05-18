@@ -17,6 +17,7 @@ interface CartContextType {
   location: Location | null;
   clearLocation: () => void;
   cartTotal: number;
+  soldOriginalNames: string[];
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [region, setRegionState] = useState<Region>('Cambodia');
   const [location, setLocationState] = useState<Location | null>(null);
+  const [soldOriginalNames, setSoldOriginalNames] = useState<string[]>([]);
 
   useEffect(() => {
     // Check cookie first (72h memory)
@@ -51,6 +53,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to parse cart', e);
       }
     }
+
+    // Fetch sold originals once on app load
+    fetch('/api/sold-originals')
+      .then(r => r.ok ? r.json() : { sold: [] })
+      .then(data => setSoldOriginalNames(data.sold || []))
+      .catch(() => {}); // Fail silently — shop stays fully open if fetch fails
   }, []);
 
   const setRegion = (newRegion: Region, newLocation?: Location) => {
@@ -105,7 +113,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartTotal = items.reduce((total, item) => total + ((item.unitPrice || item.product.price) * item.quantity), 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, isCartOpen, setIsCartOpen, region, setRegion, location, clearLocation, cartTotal }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, isCartOpen, setIsCartOpen, region, setRegion, location, clearLocation, cartTotal, soldOriginalNames }}>
       {children}
     </CartContext.Provider>
   );
