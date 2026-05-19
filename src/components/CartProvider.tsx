@@ -88,6 +88,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       );
 
       if (existingItemIndex >= 0) {
+        if (product.category === 'Originals') {
+          // Originals cannot have more than 1 quantity in cart
+          return prev;
+        }
         const newItems = [...prev];
         newItems[existingItemIndex] = {
           ...newItems[existingItemIndex],
@@ -97,7 +101,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return newItems;
       }
 
-      return [...prev, { product, quantity, selectedColor: color, selectedSize: size, unitPrice: resolvedUnitPrice }];
+      const resolvedQuantity = product.category === 'Originals' ? 1 : quantity;
+      return [...prev, { product, quantity: resolvedQuantity, selectedColor: color, selectedSize: size, unitPrice: resolvedUnitPrice }];
     });
     setIsCartOpen(true);
   };

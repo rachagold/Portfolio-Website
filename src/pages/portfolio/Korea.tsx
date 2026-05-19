@@ -5,7 +5,7 @@ import { Lightbox } from '../../components/Lightbox';
 import { Painting } from '../../lib/types';
 import { originalArtworks } from '../../data/originalArtworks';
 import { truncateDescription } from '../../lib/utils';
-
+import { useCart } from '../../components/CartProvider';
 
 export function Korea() {
   const [lightboxPainting, setLightboxPainting] = useState<Painting | null>(null);
@@ -20,6 +20,8 @@ export function Korea() {
     const product = originalArtworks.find(p => p.name === title);
     return product?.price;
   };
+
+  const { soldOriginalNames } = useCart();
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -60,7 +62,7 @@ export function Korea() {
           year={lightboxPainting.year}
           medium={lightboxPainting.medium}
           dimensions={lightboxPainting.dimensions}
-          status={lightboxPainting.status}
+          status={soldOriginalNames.includes(lightboxPainting.title) ? 'Sold' : lightboxPainting.status}
           price={getProductPrice(lightboxPainting.title)}
           onClose={() => setLightboxPainting(null)}
         />
