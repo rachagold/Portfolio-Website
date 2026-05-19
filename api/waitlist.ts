@@ -40,7 +40,7 @@ export default async function handler(req: any, res: any) {
     : '<tr><td colspan="4" style="padding:8px">No items specified</td></tr>';
 
   const emailPayload = {
-    from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+    from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
     subject: `[Preorder] ${name} — International Order`,
     replyTo: email,
     html: `

@@ -112,18 +112,22 @@ export default async function handler(req: any, res: any) {
 
       // 5. Send Email to Customer
       if (customerEmail) {
-        await resend.emails.send({
-          from: 'Rachel Goldberg Art <onboarding@resend.dev>',
-          to: customerEmail,
-          subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
-          html: emailHtml,
-        });
-        console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
+        try {
+          await resend.emails.send({
+            from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
+            to: customerEmail,
+            subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
+            html: emailHtml,
+          });
+          console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
+        } catch (emailErr: any) {
+          console.error(`Failed to send Stripe transactional email to customer: ${emailErr.message}`);
+        }
       }
 
       // 6. Notify Merchant
       await resend.emails.send({
-        from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+        from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
         to: PRIMARY_EMAIL,
         cc: CC_EMAILS,
         subject: `[Payment Successful] Order #${expandedSession.id.slice(-8).toUpperCase()}`,

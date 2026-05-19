@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const emailPayload = {
-    from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+    from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
     subject: `[Contact] ${subject} — ${firstName} ${lastName}`,
     html: `
       <h2>New Contact Form Submission</h2>

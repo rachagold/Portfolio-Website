@@ -89,7 +89,7 @@ export default async function handler(req: any, res: any) {
               });
 
               await resend.emails.send({
-                  from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+                  from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
                   to: customerEmail,
                   subject: `Thank you for your order! [#${session.id.slice(-8).toUpperCase()}]`,
                   html: emailHtml,
@@ -145,7 +145,7 @@ export default async function handler(req: any, res: any) {
               });
 
               await resend.emails.send({
-                  from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+                  from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
                   to: data.email,
                   subject: `Thank you for your order! [#CAM-${Math.floor(data.timestamp / 1000)}]`,
                   html: emailHtml,

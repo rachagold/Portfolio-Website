@@ -159,7 +159,7 @@ export default async function handler(req: any, res: any) {
         try {
             const itemSummary = items.map((item: any) => `${item.name} (Qty: ${item.quantity})`).join(', ');
             const emailPayload = {
-                from: 'Rachel Goldberg Art <onboarding@resend.dev>',
+                from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
                 to: PRIMARY_EMAIL,
                 cc: CC_EMAILS,
                 subject: `[Checkout Started] ${region || 'International'} — Pending Payment`,
