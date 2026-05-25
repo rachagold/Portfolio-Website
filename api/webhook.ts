@@ -199,7 +199,7 @@ export default async function handler(req: any, res: any) {
       // 1. Retrieve the session with expanded line items
       const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
         expand: ['line_items', 'line_items.data.price.product'],
-      });
+      }) as any;
 
       const customerEmail = expandedSession.customer_details?.email;
       const customerName = expandedSession.customer_details?.name || 'Valued Customer';

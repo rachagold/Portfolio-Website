@@ -1,5 +1,5 @@
 
-import { originalArtworks } from './src/data/originalArtworks';
+import { originalArtworks } from '../src/data/originalArtworks';
 
 originalArtworks.forEach(p => {
   if (p.image.includes('Mock Ups')) {

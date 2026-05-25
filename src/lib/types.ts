@@ -3,7 +3,7 @@ export interface Product {
   slug: string;
   name: string;
   price: number;
-  category: 'Prints' | 'T-shirts' | 'Totes' | 'Originals' | 'Accessories';
+  category: 'Prints' | 'T-shirts' | 'Totes' | 'Originals' | 'Accessories' | 'Postcards';
   collection: 'Cambodia' | 'Korea' | 'Other';
   image: string;
   hoverImage?: string;
