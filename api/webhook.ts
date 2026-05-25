@@ -1,11 +1,12 @@
 import Stripe from 'stripe';
 import { Resend } from 'resend';
-import { put } from '@vercel/blob';
+import { put, list } from '@vercel/blob'; // Fixed: Static import instead of dynamic import inside function
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: '2023-10-16' // Forces stability on type definitions
+});
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// We need to disable the default body parser for Stripe webhooks
 export const config = {
   api: {
     bodyParser: false,
@@ -14,7 +15,6 @@ export const config = {
 
 const PRIMARY_EMAIL = 'jared@ottermaticsystems.com';
 const CC_EMAILS = ['rachagold.art@gmail.com'];
-
 const BLOB_FILENAME = 'sold-originals.json';
 
 /**
@@ -22,7 +22,7 @@ const BLOB_FILENAME = 'sold-originals.json';
  */
 async function getSoldOriginals(): Promise<string[]> {
   try {
-    const { list } = await import('@vercel/blob');
+    // Fixed: Using the statically imported 'list' function
     const { blobs } = await list({ prefix: BLOB_FILENAME });
     if (blobs.length === 0) return [];
 
@@ -60,7 +60,6 @@ async function markOriginalSold(paintingName: string): Promise<void> {
     console.log(`[webhook sold-originals] Marked as sold: "${paintingName}". Total sold: ${updated.length}`);
   } catch (err) {
     console.error('[webhook sold-originals] Failed to mark as sold:', err);
-    throw err;
   }
 }
 
@@ -102,7 +101,7 @@ function generateOrderEmailHtml(data: {
     </div>
   `).join('');
 
-  const deliveryMessage = region === 'Cambodia' 
+  const deliveryMessage = region === 'Cambodia'
     ? "You will receive a personal message shortly to coordinate Grab delivery."
     : "Delivery begins in July. Thank you so much for your patience!";
 
@@ -111,55 +110,34 @@ function generateOrderEmailHtml(data: {
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thank you for your order</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #E5DCCD; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2D1F1C;">
+<body style="margin: 0; padding: 0; background-color: #E5DCCD; font-family: sans-serif; color: #2D1F1C;">
   <div style="max-width: 600px; margin: 40px auto; padding: 40px 20px;">
-    <div style="background-color: rgba(255, 255, 255, 0.5); border-radius: 32px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.4); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-      <h1 style="font-family: 'Times New Roman', serif; font-size: 32px; margin-bottom: 24px;">Thank you for supporting my art, ${customerName}</h1>
-      
-      <div style="background-color: rgba(119, 156, 145, 0.1); border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid rgba(119, 156, 145, 0.2);">
-        <h3 style="font-family: 'Times New Roman', serif; font-size: 20px; color: #93312A; margin: 0 0 8px;">Delivery Information</h3>
-        <p style="margin: 0; color: rgba(45, 31, 28, 0.8); line-height: 1.5;">${deliveryMessage}</p>
+    <div style="background-color: rgba(255, 255, 255, 0.5); border-radius: 32px; padding: 40px; border: 1px solid rgba(255, 255, 255, 0.4); text-align: center;">
+      <h1 style="font-family: serif; font-size: 32px; margin-bottom: 24px;">Thank you for supporting my art, ${customerName}</h1>
+      <div style="background-color: rgba(119, 156, 145, 0.1); border-radius: 20px; padding: 24px; margin-bottom: 32px;">
+        <h3 style="color: #93312A; margin: 0 0 8px;">Delivery Information</h3>
+        <p style="margin: 0; line-height: 1.5;">${deliveryMessage}</p>
       </div>
- 
-      <div style="text-align: left; background-color: rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 24px; border: 1px solid rgba(255, 255, 255, 0.6);">
-        <h3 style="font-family: 'Times New Roman', serif; font-size: 24px; margin: 0 0 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(45, 31, 28, 0.1);">Order Summary</h3>
+      <div style="text-align: left; background-color: rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 24px;">
+        <h3 style="margin: 0 0 24px;">Order Summary</h3>
         <p style="font-size: 14px; color: rgba(45, 31, 28, 0.6); margin-bottom: 20px;">Order #: ${orderNumber}</p>
-        
-        <div style="margin-bottom: 24px;">
-          ${itemRows}
-        </div>
- 
+        <div style="margin-bottom: 24px;">${itemRows}</div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 2px solid rgba(45, 31, 28, 0.05);">
           <span style="font-size: 18px;">Total</span>
           <span style="font-size: 24px; font-weight: 600;">$${total.toFixed(2)} ${currency}</span>
         </div>
       </div>
- 
-      ${shippingAddress ? `
-      <div style="text-align: left; margin-top: 32px; padding: 0 8px;">
-        <h3 style="font-family: 'Times New Roman', serif; font-size: 18px; margin-bottom: 12px;">Shipping Address</h3>
-        <p style="margin: 0; color: rgba(45, 31, 28, 0.7); line-height: 1.6; white-space: pre-line;">${shippingAddress}</p>
-      </div>
-      ` : ''}
- 
-      <div style="margin-top: 40px; padding-top: 32px; border-top: 1px solid rgba(45, 31, 28, 0.1);">
-        <p style="font-size: 14px; color: rgba(45, 31, 28, 0.6); margin-bottom: 12px;">Follow the journey behind the art</p>
-        <a href="https://instagram.com/rachagold.art" style="color: #2D1F1C; text-decoration: none; font-weight: 500;">@rachagold.art</a>
-      </div>
+      ${shippingAddress ? `<div style="text-align: left; margin-top: 32px;"><h3 style="font-size: 18px;">Shipping Address</h3><p style="white-space: pre-line;">${shippingAddress}</p></div>` : ''}
     </div>
   </div>
 </body>
-</html>
-  `;
+</html>`;
 }
 
 async function getRawBody(req: any): Promise<Buffer> {
-  if (Buffer.isBuffer(req.body)) {
-    return req.body;
-  }
+  if (Buffer.isBuffer(req.body)) return req.body;
   const chunks = [];
   for await (const chunk of req) {
     chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
@@ -181,56 +159,52 @@ export default async function handler(req: any, res: any) {
     return res.status(500).send('Webhook Error: Missing secret');
   }
 
-  let event;
+  let event: Stripe.Event;
 
   try {
     const body = await getRawBody(req);
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err: any) {
-    console.error(`Webhook Error: ${err.message}`);
+    console.error(`Webhook Signature Verification Error: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // ALWAYS return 200 immediately to prevent Stripe from retrying.
-  // Process the event asynchronously after acknowledging receipt.
+  // If it's not the event we want, exit quickly with a 200 OK
   if (event.type !== 'checkout.session.completed') {
-    return res.json({ received: true });
+    return res.status(200).json({ received: true });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+  console.log(`[webhook] Starting processing for Session ID: ${session.id}`);
 
   try {
-    // 1. Retrieve the session with expanded line items
+    // 1. Retrieve full session payload
     const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
       expand: ['line_items', 'line_items.data.price.product'],
     }) as any;
 
-    // 2. DEDUPLICATION: Check if we already processed this session.
-    //    If metadata contains 'email_sent', skip all email logic.
+    // 2. DEDUFICATION CHECK
     if (expandedSession.metadata?.email_sent === 'true') {
-      console.log(`[webhook] Already processed session ${session.id} — skipping to prevent duplicate emails.`);
-      return res.json({ received: true });
+      console.log(`[webhook] Deduplication triggered: Session ${session.id} already processed.`);
+      return res.status(200).json({ received: true, message: 'Already processed' });
     }
 
     const customerEmail = expandedSession.customer_details?.email;
     const customerName = expandedSession.customer_details?.name || 'Valued Customer';
-    
-    // 3. Format items for the email
+
+    // 3. Process line items securely
     const items = expandedSession.line_items?.data.map((li: any) => {
       const product = li.price?.product || {};
-      
-      let size;
-      let color;
+      let size = '';
+      let color = '';
       if (product.description) {
-          const parts = product.description.split(' | ');
-          parts.forEach((p: string) => {
-              if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
-              if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
-          });
+        product.description.split(' | ').forEach((p: string) => {
+          if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
+          if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
+        });
       }
-
       return {
-        name: product.name,
+        name: product.name || 'Artwork Item',
         quantity: li.quantity || 1,
         price: (li.price?.unit_amount || 0) / 100,
         size,
@@ -239,17 +213,15 @@ export default async function handler(req: any, res: any) {
       };
     }) || [];
 
-    // 4. Format shipping address
     const sd = expandedSession.shipping_details;
     const shippingAddress = sd ? [
       sd.name,
       sd.address?.line1,
       sd.address?.line2,
-      `${sd.address?.city}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code}`,
+      `${sd.address?.city || ''}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code || ''}`,
       sd.address?.country
     ].filter(Boolean).join('\n') : undefined;
 
-    // 5. Generate HTML
     const emailHtml = generateOrderEmailHtml({
       customerName,
       orderNumber: expandedSession.id.slice(-8).toUpperCase(),
@@ -260,78 +232,69 @@ export default async function handler(req: any, res: any) {
       currency: expandedSession.currency?.toUpperCase(),
     });
 
-    // 6. Send Email to Customer
+    // NOTE: If you are seeing 0 emails right now, ensure 'rachagold.art' is verified in Resend.
+    // If it isn't, replace the sender string below with: 'onboarding@resend.dev' to test.
+    const SENDER_EMAIL = 'Rachel Goldberg Art <thankyou@rachagold.art>';
+
+    // 4. Send Customer Email
     if (customerEmail) {
       try {
         await resend.emails.send({
-          from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
+          from: SENDER_EMAIL,
           to: customerEmail,
           subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
           html: emailHtml,
         });
-        console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
+        console.log(`[webhook] Customer email dispatched to ${customerEmail}`);
       } catch (emailErr: any) {
-        console.error(`Failed to send customer email: ${emailErr.message}`);
+        console.error(`[webhook] Resend Error (Customer Email): ${emailErr.message}`);
       }
+    } else {
+      console.log('[webhook] No customer email found in session details.');
     }
 
-    // 7. Notify Merchant (wrapped in try/catch to prevent crashes)
+    // 5. Send Merchant Email
     try {
       await resend.emails.send({
-        from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
+        from: SENDER_EMAIL,
         to: PRIMARY_EMAIL,
         cc: CC_EMAILS,
         subject: `[Payment Successful] Order #${expandedSession.id.slice(-8).toUpperCase()}`,
-        html: `
-          <h2>Payment Received!</h2>
-          <p>A new order has been paid and confirmed.</p>
-          <hr>
-          <p><strong>Customer:</strong> ${customerName} (${customerEmail || 'No email'})</p>
-          <p><strong>Region:</strong> ${expandedSession.metadata?.region || 'International'}</p>
-          <p><strong>Total:</strong> $${((expandedSession.amount_total || 0) / 100).toFixed(2)} ${expandedSession.currency?.toUpperCase()}</p>
-          <hr>
-          <h3>Shipping Address:</h3>
-          <pre>${shippingAddress || 'N/A'}</pre>
-          <hr>
-          <h3>Order Details:</h3>
-          <ul>
-            ${items.map(i => `<li>${i.name} x ${i.quantity} (${i.size ? `Size: ${i.size}` : ''}${i.color ? `, Color: ${i.color}` : ''})</li>`).join('')}
-          </ul>
-        `,
+        html: `<h2>Payment Received!</h2><p>Customer: ${customerName}</p>`,
       });
-      console.log(`Sent merchant notification for session ${session.id}`);
+      console.log(`[webhook] Merchant email dispatched to ${PRIMARY_EMAIL}`);
     } catch (merchantErr: any) {
-      console.error(`Failed to send merchant email: ${merchantErr.message}`);
+      console.error(`[webhook] Resend Error (Merchant Email): ${merchantErr.message}`);
     }
 
-    // 8. Mark session as processed to prevent duplicate emails on retries
+    // 6. Write tracking state back to Stripe metadata to lock out future retries
     try {
       await stripe.checkout.sessions.update(session.id, {
         metadata: { ...expandedSession.metadata, email_sent: 'true' },
       });
-      console.log(`[webhook] Marked session ${session.id} as email_sent=true`);
+      console.log(`[webhook] Successfully flagged session ${session.id} as processed inside Stripe.`);
     } catch (metaErr: any) {
-      console.error(`[webhook] Failed to update session metadata: ${metaErr.message}`);
+      console.error(`[webhook] Failed updating tracking flag metadata: ${metaErr.message}`);
     }
 
-    // 9. Mark any original artworks as sold
+    // 7. Process Vercel Blob sync
     try {
       for (const li of (expandedSession.line_items?.data || [])) {
         const product = (li as any).price?.product;
-        const isOriginal = product?.metadata?.category === 'Originals';
-        if (isOriginal && product?.name) {
+        if (product?.metadata?.category === 'Originals' && product?.name) {
           await markOriginalSold(product.name);
-          console.log(`Marked original artwork as sold: ${product.name}`);
         }
       }
     } catch (soldErr: any) {
-      console.error(`Error marking originals as sold: ${soldErr.message}`);
+      console.error(`[webhook] Vercel Blob operations failure: ${soldErr.message}`);
     }
 
   } catch (err: any) {
-    console.error(`Error processing checkout session: ${err.message}`);
+    console.error(`[webhook global execution error]: ${err.message}`);
+    // If code execution breaks inside the main pipeline, return a 500 error so Stripe attempts a healthy retry later.
+    return res.status(500).send(`Internal Webhook Processing Failure: ${err.message}`);
   }
 
-  // Always return 200 to acknowledge receipt
-  res.json({ received: true });
+  // 8. Final Acknowledgement Response
+  return res.status(200).json({ received: true });
 }
