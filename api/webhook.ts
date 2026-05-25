@@ -191,81 +191,92 @@ export default async function handler(req: any, res: any) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle the event
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
+  // ALWAYS return 200 immediately to prevent Stripe from retrying.
+  // Process the event asynchronously after acknowledging receipt.
+  if (event.type !== 'checkout.session.completed') {
+    return res.json({ received: true });
+  }
 
-    try {
-      // 1. Retrieve the session with expanded line items
-      const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['line_items', 'line_items.data.price.product'],
-      }) as any;
+  const session = event.data.object as Stripe.Checkout.Session;
 
-      const customerEmail = expandedSession.customer_details?.email;
-      const customerName = expandedSession.customer_details?.name || 'Valued Customer';
+  try {
+    // 1. Retrieve the session with expanded line items
+    const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
+      expand: ['line_items', 'line_items.data.price.product'],
+    }) as any;
+
+    // 2. DEDUPLICATION: Check if we already processed this session.
+    //    If metadata contains 'email_sent', skip all email logic.
+    if (expandedSession.metadata?.email_sent === 'true') {
+      console.log(`[webhook] Already processed session ${session.id} — skipping to prevent duplicate emails.`);
+      return res.json({ received: true });
+    }
+
+    const customerEmail = expandedSession.customer_details?.email;
+    const customerName = expandedSession.customer_details?.name || 'Valued Customer';
+    
+    // 3. Format items for the email
+    const items = expandedSession.line_items?.data.map((li: any) => {
+      const product = li.price?.product || {};
       
-      // 2. Format items for the email
-      const items = expandedSession.line_items?.data.map((li: any) => {
-        const product = li.price?.product || {};
-        
-        // Parse size/color from description if available
-        let size;
-        let color;
-        if (product.description) {
-            const parts = product.description.split(' | ');
-            parts.forEach((p: string) => {
-                if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
-                if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
-            });
-        }
-
-        return {
-          name: product.name,
-          quantity: li.quantity || 1,
-          price: (li.price?.unit_amount || 0) / 100,
-          size,
-          color,
-          image: product.images?.[0] || '',
-        };
-      }) || [];
-
-      // 3. Format shipping address
-      const sd = expandedSession.shipping_details;
-      const shippingAddress = sd ? [
-        sd.name,
-        sd.address?.line1,
-        sd.address?.line2,
-        `${sd.address?.city}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code}`,
-        sd.address?.country
-      ].filter(Boolean).join('\n') : undefined;
-
-      // 4. Generate HTML
-      const emailHtml = generateOrderEmailHtml({
-        customerName,
-        orderNumber: expandedSession.id.slice(-8).toUpperCase(), // Use last 8 chars as order number
-        items,
-        region: expandedSession.metadata?.region || 'International',
-        shippingAddress,
-        total: (expandedSession.amount_total || 0) / 100,
-        currency: expandedSession.currency?.toUpperCase(),
-      });
-
-      // 5. Send Email to Customer
-      if (customerEmail) {
-        try {
-          await resend.emails.send({
-            from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
-            to: customerEmail,
-            subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
-            html: emailHtml,
+      let size;
+      let color;
+      if (product.description) {
+          const parts = product.description.split(' | ');
+          parts.forEach((p: string) => {
+              if (p.startsWith('Size: ')) size = p.replace('Size: ', '');
+              if (p.startsWith('Color: ')) color = p.replace('Color: ', '');
           });
-          console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
-        } catch (emailErr: any) {
-          console.error(`Failed to send Stripe transactional email to customer: ${emailErr.message}`);
-        }
       }
 
-      // 6. Notify Merchant
+      return {
+        name: product.name,
+        quantity: li.quantity || 1,
+        price: (li.price?.unit_amount || 0) / 100,
+        size,
+        color,
+        image: product.images?.[0] || '',
+      };
+    }) || [];
+
+    // 4. Format shipping address
+    const sd = expandedSession.shipping_details;
+    const shippingAddress = sd ? [
+      sd.name,
+      sd.address?.line1,
+      sd.address?.line2,
+      `${sd.address?.city}${sd.address?.state ? `, ${sd.address.state}` : ''} ${sd.address?.postal_code}`,
+      sd.address?.country
+    ].filter(Boolean).join('\n') : undefined;
+
+    // 5. Generate HTML
+    const emailHtml = generateOrderEmailHtml({
+      customerName,
+      orderNumber: expandedSession.id.slice(-8).toUpperCase(),
+      items,
+      region: expandedSession.metadata?.region || 'International',
+      shippingAddress,
+      total: (expandedSession.amount_total || 0) / 100,
+      currency: expandedSession.currency?.toUpperCase(),
+    });
+
+    // 6. Send Email to Customer
+    if (customerEmail) {
+      try {
+        await resend.emails.send({
+          from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
+          to: customerEmail,
+          subject: `Thank you for your order! [#${expandedSession.id.slice(-8).toUpperCase()}]`,
+          html: emailHtml,
+        });
+        console.log(`Sent transactional email to ${customerEmail} for session ${session.id}`);
+      } catch (emailErr: any) {
+        console.error(`Failed to send customer email: ${emailErr.message}`);
+      }
+    }
+
+    // 7. Notify Merchant (wrapped in try/catch to prevent crashes)
+    try {
       await resend.emails.send({
         from: 'Rachel Goldberg Art <thankyou@rachagold.art>',
         to: PRIMARY_EMAIL,
@@ -289,27 +300,38 @@ export default async function handler(req: any, res: any) {
         `,
       });
       console.log(`Sent merchant notification for session ${session.id}`);
-
-      // 7. Mark any original artworks as sold so they are removed from both shops
-      try {
-        for (const li of (expandedSession.line_items?.data || [])) {
-          const product = (li as any).price?.product;
-          // Originals are sent to Stripe with category in product metadata (set in checkout.ts)
-          const isOriginal = product?.metadata?.category === 'Originals';
-          if (isOriginal && product?.name) {
-            await markOriginalSold(product.name);
-            console.log(`Marked original artwork as sold: ${product.name}`);
-          }
-        }
-      } catch (soldErr: any) {
-        console.error(`Error marking originals as sold: ${soldErr.message}`);
-      }
-
-    } catch (err: any) {
-      console.error(`Error processing checkout session: ${err.message}`);
+    } catch (merchantErr: any) {
+      console.error(`Failed to send merchant email: ${merchantErr.message}`);
     }
+
+    // 8. Mark session as processed to prevent duplicate emails on retries
+    try {
+      await stripe.checkout.sessions.update(session.id, {
+        metadata: { ...expandedSession.metadata, email_sent: 'true' },
+      });
+      console.log(`[webhook] Marked session ${session.id} as email_sent=true`);
+    } catch (metaErr: any) {
+      console.error(`[webhook] Failed to update session metadata: ${metaErr.message}`);
+    }
+
+    // 9. Mark any original artworks as sold
+    try {
+      for (const li of (expandedSession.line_items?.data || [])) {
+        const product = (li as any).price?.product;
+        const isOriginal = product?.metadata?.category === 'Originals';
+        if (isOriginal && product?.name) {
+          await markOriginalSold(product.name);
+          console.log(`Marked original artwork as sold: ${product.name}`);
+        }
+      }
+    } catch (soldErr: any) {
+      console.error(`Error marking originals as sold: ${soldErr.message}`);
+    }
+
+  } catch (err: any) {
+    console.error(`Error processing checkout session: ${err.message}`);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
+  // Always return 200 to acknowledge receipt
   res.json({ received: true });
 }
