@@ -126,6 +126,92 @@ export const collectionProducts: Product[] = [
   },
 
   // ══════════════════════════════════════════════════════════════════
+  //  RUSSIAN MARKET 26
+  // ══════════════════════════════════════════════════════════════════
+  {
+    id: 'rm26-prints',
+    slug: 'russian-market-26-prints',
+    name: 'Russian Market 26 — Prints',
+    price: 18,
+    category: 'Prints',
+    collection: 'Cambodia',
+    image: p('Russian Market 26', 'Russian Market 26 - All Prints.png'),
+    images: [
+      p('Russian Market 26', 'Russian Market 26 - All Prints.png'),
+      p('Russian Market 26', 'Russian Market 26 - All.png'),
+      // primary: size-specific, non-"2"
+      p('Russian Market 26', 'Russian Market 26 - A4.png'),
+      p('Russian Market 26', 'Russian Market 26 - A3.png'),
+      p('Russian Market 26', 'Russian Market 26 - A2.png'),
+      p('Russian Market 26', 'Russian Market 26 - Post Card.png'),
+      // secondary / alternates
+      p('Russian Market 26', 'Russian Market 26 - Print 2.png'),
+    ],
+    description: 'High quality glossy 300gsm prints of Russian Market 26.',
+    sizes: PRINT_SIZES,
+    sizePrice: PRINT_PRICES,
+    sizeImages: {
+      'A6 (Post card)': p('Russian Market 26', 'Russian Market 26 - Post Card.png'),
+      'A4': p('Russian Market 26', 'Russian Market 26 - A4.png'),
+      'A3 (Poster)': p('Russian Market 26', 'Russian Market 26 - A3.png'),
+      'A2 (Large Poster)': p('Russian Market 26', 'Russian Market 26 - A2.png'),
+    },
+    inStock: true,
+  },
+  {
+    id: 'rm26-tees',
+    slug: 'russian-market-26-tees',
+    name: 'Russian Market 26 — Tee',
+    price: 30,
+    category: 'T-shirts',
+    collection: 'Cambodia',
+    image: p('Russian Market 26', 'Russian Market 26 - Tee White.png'),
+    hoverImage: p('Russian Market 26', 'Russian Market 26 - Tee black.png'),
+    images: [
+      p('Russian Market 26', 'Russian Market 26 - Tee White.png'),
+      p('Russian Market 26', 'Russian Market 26 - Tee black.png'),
+      p('Russian Market 26', 'Russian Market 26 - Tee Beige.png'),
+    ],
+    description: 'Soft cotton t-shirt featuring the Russian Market 26 painting. 100% cotton, 250 GSM.',
+    colors: ['White', 'Black', 'Beige'],
+    colorImages: {
+      White: p('Russian Market 26', 'Russian Market 26 - Tee White.png'),
+      Black: p('Russian Market 26', 'Russian Market 26 - Tee black.png'),
+      Beige: p('Russian Market 26', 'Russian Market 26 - Tee Beige.png'),
+    },
+    sizes: TEE_SIZES,
+    inStock: true,
+  },
+  {
+    id: 'rm26-totes',
+    slug: 'russian-market-26-totes',
+    name: 'Russian Market 26 — Tote',
+    price: 20,
+    category: 'Totes',
+    collection: 'Cambodia',
+    image: p('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+    images: [
+      p('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+      p('Russian Market 26', 'Russian Market 26 - Tote Black.png'),
+      p('Russian Market 26', 'Russian Market 26 - Tote white.png'),
+    ],
+    description: 'Sturdy canvas tote bag featuring the Russian Market 26 painting.',
+    colors: ['Beige', 'Black', 'White'],
+    colorImages: {
+      Beige: p('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+      Black: p('Russian Market 26', 'Russian Market 26 - Tote Black.png'),
+      White: p('Russian Market 26', 'Russian Market 26 - Tote white.png'),
+    },
+    sizes: TOTE_SIZES,
+    sizeImages: {
+      Standard: p('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+      Large: p('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+    },
+    sizePrice: TOTE_PRICES,
+    inStock: true,
+  },
+
+  // ══════════════════════════════════════════════════════════════════
   //  PHNOM AORAL
   // ══════════════════════════════════════════════════════════════════
   {

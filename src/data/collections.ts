@@ -244,6 +244,36 @@ export const COLLECTIONS: CollectionDef[] = [
       },
     },
   },
+
+  // ── 8. Russian Market 26 ──────────────────────────────────────────────────
+  {
+    name: 'Russian Market 26',
+    displayName: 'Russian Market 26 Collection',
+    slug: 'russian-market-26',
+    coverImage: asset('Russian Market 26', 'Russian Market 26 - All.png'),
+    tiles: {
+      prints: {
+        thumbnail: asset('Russian Market 26', 'Russian Market 26 - All Prints.png'),
+        slug: 'russian-market-26-prints',
+      },
+      postcards: {
+        thumbnail: asset('Russian Market 26', 'Russian Market 26 - Post Card.png'),
+        slug: 'russian-market-26-postcards',
+      },
+      tees: {
+        thumbnail: asset('Russian Market 26', 'Russian Market 26 - Tee White.png'),
+        slug: 'russian-market-26-tees',
+      },
+      totes: {
+        thumbnail: asset('Russian Market 26', 'Russian Market 26 - Tote Beige.png'),
+        slug: 'russian-market-26-totes',
+      },
+      original: {
+        thumbnail: painting('cambodia', 'russian_market_ii.png'),
+        slug: 'original-russian-market-26',
+      },
+    },
+  },
 ];
 
 /** The 8th box: Daun Penh originals gateway */
