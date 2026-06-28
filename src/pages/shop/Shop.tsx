@@ -7,6 +7,7 @@ import { products } from '../../data/products';
 import { getPriceRange } from '../../lib/pricing';
 import { Filter } from 'lucide-react';
 import { truncateDescription } from '../../lib/utils';
+import { USShopComingSoon } from './USShopComingSoon';
 
 
 function OOSBadge() {
@@ -88,7 +89,12 @@ function OriginalsBox() {
 }
 
 export function Shop() {
-  const { region, location, soldOriginalNames } = useCart();
+  const { region, location, soldOriginalNames, cambodiaInventory } = useCart();
+  
+  if (location === 'US') {
+    return <USShopComingSoon />;
+  }
+
   const [activeFilter, setActiveFilter] = useState('Show All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -118,6 +124,12 @@ export function Shop() {
         .filter(p => p.category === currentCategory)
         // For originals, hide any that have been sold
         .filter(p => p.category !== 'Originals' || !soldOriginalNames.includes(p.name))
+        // For Cambodia, hide products with zero inventory or missing from file
+        .filter(p => {
+          if (location !== 'KH' || p.category === 'Originals') return true;
+          const inv = cambodiaInventory[p.id];
+          return inv && inv.inStock && inv.totalQty > 0;
+        })
     : [];
 
   return (

@@ -10,13 +10,15 @@ import { truncateDescription } from '../../lib/utils';
 
 export function CategoryPage() {
   const { categorySlug } = useParams<{ categorySlug: string }>();
-  const { region, location } = useCart();
+  const { region, location, cambodiaInventory } = useCart();
 
-  // Map slugs like 'postcards', 'tees', 'prints' back to correct Category name or display name.
-  // Note: For now, we will perform a case-insensitive filtering against product.category.
-  const categoryProducts = products.filter(
-    (p) => p.category.toLowerCase() === categorySlug?.toLowerCase()
-  );
+  const categoryProducts = products
+    .filter((p) => p.category.toLowerCase() === categorySlug?.toLowerCase())
+    .filter((p) => {
+      if (location !== 'KH' || p.category === 'Originals') return true;
+      const inv = cambodiaInventory[p.id];
+      return inv && inv.inStock && inv.totalQty > 0;
+    });
 
   // Derive display name from the first matched product's category, fallback to stylized slug
   const title = categoryProducts.length > 0 

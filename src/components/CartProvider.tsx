@@ -5,6 +5,14 @@ import { getCookie, setCookie, deleteCookie } from '../lib/cookies';
 export type Region = 'Cambodia' | 'International' | 'Other';
 export type Location = 'US' | 'CA' | 'KH' | 'Other';
 
+export interface CambodiaInventoryItem {
+  id: string;
+  inStock: boolean;
+  totalQty: number;
+  quantities: Record<string, number>;
+}
+export type CambodiaInventory = Record<string, CambodiaInventoryItem>;
+
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product, quantity: number, color?: string, size?: string, unitPrice?: number) => void;
@@ -18,6 +26,8 @@ interface CartContextType {
   clearLocation: () => void;
   cartTotal: number;
   soldOriginalNames: string[];
+  cambodiaInventory: CambodiaInventory;
+  refreshInventory: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -28,6 +38,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [region, setRegionState] = useState<Region>('Cambodia');
   const [location, setLocationState] = useState<Location | null>(null);
   const [soldOriginalNames, setSoldOriginalNames] = useState<string[]>([]);
+  const [cambodiaInventory, setCambodiaInventory] = useState<CambodiaInventory>({});
+
+  const refreshInventory = async () => {
+    try {
+      const res = await fetch('/api/cambodia-inventory');
+      if (res.ok) {
+        const data = await res.json();
+        setCambodiaInventory(data.inventory || {});
+      }
+    } catch (e) {
+      console.error('Failed to fetch Cambodia inventory', e);
+    }
+  };
 
   useEffect(() => {
     // Check cookie first (72h memory)
@@ -59,6 +82,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       .then(r => r.ok ? r.json() : { sold: [] })
       .then(data => setSoldOriginalNames(data.sold || []))
       .catch(() => {}); // Fail silently — shop stays fully open if fetch fails
+
+    refreshInventory();
   }, []);
 
   const setRegion = (newRegion: Region, newLocation?: Location) => {
@@ -118,7 +143,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartTotal = items.reduce((total, item) => total + ((item.unitPrice || item.product.price) * item.quantity), 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, isCartOpen, setIsCartOpen, region, setRegion, location, clearLocation, cartTotal, soldOriginalNames }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, isCartOpen, setIsCartOpen, region, setRegion, location, clearLocation, cartTotal, soldOriginalNames, cambodiaInventory, refreshInventory }}>
       {children}
     </CartContext.Provider>
   );

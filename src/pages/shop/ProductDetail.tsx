@@ -38,8 +38,78 @@ function resolveTypeLabel(slug: string): string {
 export function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
   const product = products.find((p) => p.slug === slug);
-  const { addToCart, region, location, soldOriginalNames } = useCart();
+  const { addToCart, region, location, soldOriginalNames, cambodiaInventory } = useCart();
   const currencyPrefix = getCurrencyPrefix(location);
+
+  const getStockForSelection = (color?: string, size?: string): number => {
+    if (!product || location !== 'KH' || product.category === 'Originals') {
+      return Infinity;
+    }
+    const inv = cambodiaInventory[product.id];
+    if (!inv) return 0;
+
+    const normalizeSize = (sz: string): string => {
+      const s = sz.toLowerCase().trim();
+      if (s === 'small' || s === 's') return 's';
+      if (s === 'medium' || s === 'm') return 'm';
+      if (s === 'large' || s === 'l') return 'l';
+      if (s === 'x-large' || s === 'xl') return 'xl';
+      if (s === 'xx-large' || s === 'xxl') return 'xxl';
+      if (s.includes('standard')) return 'standard';
+      if (s.includes('large')) return 'large';
+      if (s.includes('a3')) return 'a3';
+      if (s.includes('a4')) return 'a4';
+      if (s.includes('a2')) return 'a2';
+      if (s.includes('postcard') || s.includes('post card') || s === 'a6') return 'postcard';
+      return s;
+    };
+    const normalizeColor = (col: string): string => col.toLowerCase().trim();
+
+    if (product.category === 'T-shirts' || product.category === 'Totes') {
+      if (!color || !size) {
+        return inv.totalQty;
+      }
+      const key = `${normalizeColor(color)}_${normalizeSize(size)}`;
+      return inv.quantities[key] || 0;
+    }
+
+    if (product.category === 'Prints') {
+      if (!size) return inv.totalQty;
+      const key = normalizeSize(size);
+      return inv.quantities[key] || 0;
+    }
+
+    if (product.category === 'Postcards') {
+      return inv.quantities['single'] || 0;
+    }
+
+    return 0;
+  };
+
+  const isSizeOOS = (size: string): boolean => {
+    if (!product || location !== 'KH' || product.category === 'Originals') return false;
+    if (product.category === 'Prints') {
+      return getStockForSelection(undefined, size) === 0;
+    }
+    if (product.category === 'T-shirts' || product.category === 'Totes') {
+      if (selectedColor) {
+        return getStockForSelection(selectedColor, size) === 0;
+      }
+      return (product.colors || []).every(c => getStockForSelection(c, size) === 0);
+    }
+    return false;
+  };
+
+  const isColorOOS = (color: string): boolean => {
+    if (!product || location !== 'KH' || product.category === 'Originals') return false;
+    if (product.category === 'T-shirts' || product.category === 'Totes') {
+      if (selectedSize) {
+        return getStockForSelection(color, selectedSize) === 0;
+      }
+      return (product.sizes || []).every(s => getStockForSelection(color, s) === 0);
+    }
+    return false;
+  };
 
   const isSoldOriginal = product?.category === 'Originals' && soldOriginalNames.includes(product.name);
 
@@ -118,7 +188,20 @@ export function ProductDetail() {
     }
   }, [product?.slug]);
 
-  if (!product) {
+  // Cap quantity by current stock when stock changes
+  useEffect(() => {
+    if (product && location === 'KH' && product.category !== 'Originals') {
+      const currentStock = getStockForSelection(selectedColor, selectedSize);
+      if (currentStock !== Infinity && quantity > currentStock) {
+        setQuantity(Math.max(1, currentStock));
+      }
+    }
+  }, [selectedColor, selectedSize, cambodiaInventory, location, product, quantity]);
+
+  const inv = cambodiaInventory[product?.id || ''];
+  const isKHHidden = location === 'KH' && product?.category !== 'Originals' && (!inv || !inv.inStock || inv.totalQty === 0);
+
+  if (!product || isKHHidden) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-24 text-center">
         <p className="text-[#2D1F1C]/60 mb-6">Product not found.</p>
@@ -195,7 +278,11 @@ export function ProductDetail() {
     finalRelated.push(...fallback.slice(0, 4 - finalRelated.length));
   }
 
-  const increaseQuantity = () => setQuantity((prev) => prev + 1);
+  const increaseQuantity = () => {
+    if (!product) return;
+    const currentStock = getStockForSelection(selectedColor, selectedSize);
+    setQuantity((prev) => (currentStock !== Infinity && prev >= currentStock ? prev : prev + 1));
+  };
   const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   return (
@@ -320,9 +407,14 @@ export function ProductDetail() {
                     }`}
                 >
                   <option value="" disabled>Select a size...</option>
-                  {product.sizes.map((size) => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
+                  {product.sizes.map((size) => {
+                    const oos = isSizeOOS(size);
+                    return (
+                      <option key={size} value={size} disabled={oos}>
+                        {size} {oos ? '(Out of Stock)' : ''}
+                      </option>
+                    );
+                  })}
                 </select>
                 <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-[#93312A] pointer-events-none" />
               </div>
@@ -341,9 +433,14 @@ export function ProductDetail() {
                     }`}
                 >
                   <option value="" disabled>Select a color...</option>
-                  {product.colors.map((color) => (
-                    <option key={color} value={color}>{color}</option>
-                  ))}
+                  {product.colors.map((color) => {
+                    const oos = isColorOOS(color);
+                    return (
+                      <option key={color} value={color} disabled={oos}>
+                        {color} {oos ? '(Out of Stock)' : ''}
+                      </option>
+                    );
+                  })}
                 </select>
                 <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-[#93312A] pointer-events-none" />
               </div>
@@ -399,7 +496,8 @@ export function ProductDetail() {
                 const noOptionsSelected =
                   (product.sizes?.length && !selectedSize) ||
                   (product.colors?.length && !selectedColor);
-                const disabled = Boolean(noOptionsSelected) || !product.inStock;
+                const isOutOfStock = location === 'KH' && product.category !== 'Originals' && !noOptionsSelected && getStockForSelection(selectedColor, selectedSize) === 0;
+                const disabled = Boolean(noOptionsSelected) || !product.inStock || isOutOfStock;
                 return (
                   <button
                     onClick={handleAddToCart}
@@ -409,7 +507,7 @@ export function ProductDetail() {
                         : 'bg-[#779C91] hover:bg-[#5E857A] text-white'
                       }`}
                   >
-                    {!product.inStock
+                    {(!product.inStock || isOutOfStock)
                       ? 'Out of Stock'
                       : noOptionsSelected
                         ? 'Select Options'

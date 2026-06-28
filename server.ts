@@ -84,6 +84,17 @@ async function startServer() {
     }
   });
 
+  // Cambodia Inventory API
+  app.get("/api/cambodia-inventory", async (req, res) => {
+    try {
+      const { default: handler } = await import("./api/cambodia-inventory.ts");
+      await handler(req, res);
+    } catch (error) {
+      console.error("Inventory Handler Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

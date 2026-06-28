@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { Layout } from './Layout';
 import { Home } from './pages/Home';
 import { Cambodia } from './pages/portfolio/Cambodia';
@@ -41,6 +41,7 @@ function ScrollToTop() {
 function LocationGate() {
   const { location } = useCart();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [showSelector, setShowSelector] = React.useState(false);
 
   React.useEffect(() => {
@@ -52,6 +53,12 @@ function LocationGate() {
       setShowSelector(false);
     }
   }, [location, pathname]);
+
+  React.useEffect(() => {
+    if (location === 'US' && pathname.startsWith('/shop') && pathname !== '/shop') {
+      navigate('/shop', { replace: true });
+    }
+  }, [location, pathname, navigate]);
 
   return (
     <>

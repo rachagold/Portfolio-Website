@@ -2,6 +2,181 @@ import Stripe from 'stripe';
 import crypto from 'crypto';
 import { Resend } from 'resend';
 import { put } from '@vercel/blob';
+import fs from 'fs';
+import path from 'path';
+import { cleanName, normalizeSize, normalizeColor } from './cambodia-inventory';
+
+const processedOrdersPath = path.join(process.cwd(), 'Docs/processed-orders.json');
+
+function getProcessedOrders(): string[] {
+  try {
+    if (fs.existsSync(processedOrdersPath)) {
+      const data = fs.readFileSync(processedOrdersPath, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.error('Failed to read processed-orders.json', err);
+  }
+  return [];
+}
+
+function markOrderProcessed(orderId: string) {
+  try {
+    const orders = getProcessedOrders();
+    if (!orders.includes(orderId)) {
+      orders.push(orderId);
+      if (!fs.existsSync(path.dirname(processedOrdersPath))) {
+        fs.mkdirSync(path.dirname(processedOrdersPath), { recursive: true });
+      }
+      fs.writeFileSync(processedOrdersPath, JSON.stringify(orders, null, 2), 'utf-8');
+    }
+  } catch (err) {
+    console.error('Failed to write processed-orders.json', err);
+  }
+}
+
+function deductInventoryFromCSV(items: any[]) {
+  const csvPath = path.join(process.cwd(), 'Docs/Inventory.csv');
+  if (!fs.existsSync(csvPath)) {
+    console.error('Inventory.csv not found, skipping deduction');
+    return;
+  }
+
+  const content = fs.readFileSync(csvPath, 'utf-8');
+  const lines = content.split(/\r?\n/);
+  if (lines.length < 3) return;
+
+  const tshirts: { index: number; artwork: string; color: string; size: string; qty: number }[] = [];
+  const totes: { index: number; artwork: string; color: string; size: string; qty: number }[] = [];
+  const prints: { index: number; artwork: string; size: string; qty: number }[] = [];
+
+  for (let i = 2; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    const parts = line.split(',');
+
+    if (parts[0] && parts[0].trim()) {
+      tshirts.push({
+        index: i,
+        artwork: parts[0].trim(),
+        color: parts[2] ? parts[2].trim() : '',
+        size: parts[3] ? parts[3].trim() : '',
+        qty: parseInt(parts[4]) || 0
+      });
+    }
+    if (parts[7] && parts[7].trim()) {
+      totes.push({
+        index: i,
+        artwork: parts[7].trim(),
+        color: parts[8] ? parts[8].trim() : '',
+        size: parts[9] ? parts[9].trim() : '',
+        qty: parseInt(parts[10]) || 0
+      });
+    }
+    if (parts[13] && parts[13].trim()) {
+      prints.push({
+        index: i,
+        artwork: parts[13].trim(),
+        size: parts[14] ? parts[14].trim() : '',
+        qty: parseInt(parts[15]) || 0
+      });
+    }
+  }
+
+  const tshirtNamesCsv = Array.from(new Set(tshirts.map(t => cleanName(t.artwork))));
+  const toteNamesCsv = Array.from(new Set(totes.map(t => cleanName(t.artwork))));
+  const printNamesCsv = Array.from(new Set(prints.map(p => cleanName(p.artwork))));
+
+  const fuzzyMatch = (codeCleaned: string, csvCleanedNames: string[]): string | null => {
+    if (csvCleanedNames.includes(codeCleaned)) return codeCleaned;
+    const prefixMatch = csvCleanedNames.find(name => name.startsWith(codeCleaned) || codeCleaned.startsWith(name));
+    if (prefixMatch) return prefixMatch;
+    const includesMatch = csvCleanedNames.find(name => name.includes(codeCleaned) || codeCleaned.includes(name));
+    if (includesMatch) return includesMatch;
+    return null;
+  };
+
+  for (const item of items) {
+    const qtyToDeduct = item.quantity || 1;
+    const category = item.product?.category || item.category;
+    if (category === 'Originals') continue;
+
+    const cleanedCodeName = cleanName(item.product?.name || item.name || '');
+    let matchedCsvName: string | null = null;
+
+    if (category === 'T-shirts') {
+      matchedCsvName = fuzzyMatch(cleanedCodeName, tshirtNamesCsv);
+      if (matchedCsvName) {
+        const itemColor = normalizeColor(item.selectedColor || item.color || '');
+        const itemSize = normalizeSize(item.selectedSize || item.size || '');
+
+        const matchingRows = tshirts.filter(row => cleanName(row.artwork) === matchedCsvName && normalizeColor(row.color) === itemColor && normalizeSize(row.size) === itemSize);
+        let remainingDeduct = qtyToDeduct;
+        for (const row of matchingRows) {
+          if (remainingDeduct <= 0) break;
+          const parts = lines[row.index].split(',');
+          const currentQty = parseInt(parts[4]) || 0;
+          const deducted = Math.min(currentQty, remainingDeduct);
+          parts[4] = Math.max(0, currentQty - deducted).toString();
+          lines[row.index] = parts.join(',');
+          remainingDeduct -= deducted;
+        }
+      }
+    } else if (category === 'Totes') {
+      matchedCsvName = fuzzyMatch(cleanedCodeName, toteNamesCsv);
+      if (matchedCsvName) {
+        const itemColor = normalizeColor(item.selectedColor || item.color || '');
+        const itemSize = normalizeSize(item.selectedSize || item.size || '');
+
+        const matchingRows = totes.filter(row => cleanName(row.artwork) === matchedCsvName && normalizeColor(row.color) === itemColor && normalizeSize(row.size) === itemSize);
+        let remainingDeduct = qtyToDeduct;
+        for (const row of matchingRows) {
+          if (remainingDeduct <= 0) break;
+          const parts = lines[row.index].split(',');
+          const currentQty = parseInt(parts[10]) || 0;
+          const deducted = Math.min(currentQty, remainingDeduct);
+          parts[10] = Math.max(0, currentQty - deducted).toString();
+          lines[row.index] = parts.join(',');
+          remainingDeduct -= deducted;
+        }
+      }
+    } else if (category === 'Prints') {
+      matchedCsvName = fuzzyMatch(cleanedCodeName, printNamesCsv);
+      if (matchedCsvName) {
+        const itemSize = normalizeSize(item.selectedSize || item.size || '');
+
+        const matchingRows = prints.filter(row => cleanName(row.artwork) === matchedCsvName && normalizeSize(row.size) === itemSize);
+        let remainingDeduct = qtyToDeduct;
+        for (const row of matchingRows) {
+          if (remainingDeduct <= 0) break;
+          const parts = lines[row.index].split(',');
+          const currentQty = parseInt(parts[15]) || 0;
+          const deducted = Math.min(currentQty, remainingDeduct);
+          parts[15] = Math.max(0, currentQty - deducted).toString();
+          lines[row.index] = parts.join(',');
+          remainingDeduct -= deducted;
+        }
+      }
+    } else if (category === 'Postcards') {
+      matchedCsvName = fuzzyMatch(cleanedCodeName, printNamesCsv);
+      if (matchedCsvName) {
+        const matchingRows = prints.filter(row => cleanName(row.artwork) === matchedCsvName && normalizeSize(row.size) === 'postcard');
+        let remainingDeduct = qtyToDeduct;
+        for (const row of matchingRows) {
+          if (remainingDeduct <= 0) break;
+          const parts = lines[row.index].split(',');
+          const currentQty = parseInt(parts[15]) || 0;
+          const deducted = Math.min(currentQty, remainingDeduct);
+          parts[15] = Math.max(0, currentQty - deducted).toString();
+          lines[row.index] = parts.join(',');
+          remainingDeduct -= deducted;
+        }
+      }
+    }
+  }
+
+  fs.writeFileSync(csvPath, lines.join('\n'), 'utf-8');
+}
 
 const BLOB_FILENAME = 'sold-originals.json';
 
@@ -200,7 +375,17 @@ export default async function handler(req: any, res: any) {
       }) || [];
 
 
-      return res.status(200).json({ items, region: region || session.metadata?.region || 'International' });
+      const orderRegion = region || session.metadata?.region || 'International';
+      if (orderRegion === 'Cambodia') {
+        const orderId = session.id;
+        const processed = getProcessedOrders();
+        if (!processed.includes(orderId)) {
+          deductInventoryFromCSV(items);
+          markOrderProcessed(orderId);
+        }
+      }
+
+      return res.status(200).json({ items, region: orderRegion });
       
     } else if (token) {
       // Validate Cambodia HMAC Token
@@ -279,6 +464,15 @@ export default async function handler(req: any, res: any) {
         }
       } catch (soldErr: any) {
         console.error(`[ABA] Error marking originals as sold: ${soldErr.message}`);
+      }
+
+      if (data.region === 'Cambodia') {
+        const orderId = token as string;
+        const processed = getProcessedOrders();
+        if (!processed.includes(orderId)) {
+          deductInventoryFromCSV(items);
+          markOrderProcessed(orderId);
+        }
       }
 
       return res.status(200).json({ items, region: data.region });

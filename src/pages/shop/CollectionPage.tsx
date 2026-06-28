@@ -68,7 +68,7 @@ function ProductTile({ label, tile }: TileProps) {
 export function CollectionPage() {
   const { collectionSlug } = useParams<{ collectionSlug: string }>();
   const navigate = useNavigate();
-  const { soldOriginalNames } = useCart();
+  const { soldOriginalNames, location, cambodiaInventory } = useCart();
 
   const col: CollectionDef | undefined = COLLECTIONS.find((c) => c.slug === collectionSlug);
 
@@ -81,21 +81,31 @@ export function CollectionPage() {
     );
   }
 
-  const tiles: { label: string; tile: CollectionTileDef }[] = [
+  const tiles: { label: string; tile: CollectionTileDef | undefined }[] = [
     { label: 'Prints', tile: col.tiles.prints },
     { label: 'Postcards', tile: col.tiles.postcards },
     { label: 'Tees', tile: col.tiles.tees },
     { label: 'Totes', tile: col.tiles.totes },
     { label: 'Original', tile: col.tiles.original },
   ].filter(({ label, tile }) => {
+    if (!tile || !tile.slug) return false;
+    const product = products.find((p) => p.slug === tile.slug);
+    if (!product) return false;
+
     if (label === 'Original') {
-      const product = products.find((p) => p.slug === tile.slug);
-      if (product && soldOriginalNames.includes(product.name)) {
+      if (soldOriginalNames.includes(product.name)) {
         return false;
+      }
+    } else {
+      if (location === 'KH') {
+        const inv = cambodiaInventory[product.id];
+        if (!inv || !inv.inStock || inv.totalQty === 0) {
+          return false;
+        }
       }
     }
     return true;
-  });
+  }) as { label: string; tile: CollectionTileDef }[];
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
